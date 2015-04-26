@@ -1,6 +1,7 @@
 /**
  * Created by woodie on 4/23/15.
  */
+config = require('cloud/config.js');
 
 var _getUntreatedData = function (UserRawdata){
     var promise = new AV.Promise();
@@ -39,6 +40,7 @@ var _labelRawdataSenzed = function (UserRawdata, rawdata_id){
     query.get(rawdata_id, {
         success: function(userRawdata){
             var date = new Date();
+            // *** HERE NEED TO REVISE THE PROCESS STATUS TO SENZED ***
             userRawdata.set('processStatus', 'untreated');
             userRawdata.set('senzedAt', date);
             userRawdata.save().then(
@@ -59,32 +61,8 @@ var _labelRawdataSenzed = function (UserRawdata, rawdata_id){
     return promise;
 };
 
-exports.getUntreatedRawdata = function (){
-    console.log('\nRetrieving untreated data...');
-    return AV.Promise.when(
-        _getUntreatedData('UserLocation'),
-        _getUntreatedData('UserMotion'),
-        _getUntreatedData('UserSound')
-    );
-};
-
-exports.labelRawdataSenzed = function (location_id_list, motion_id_list, sound_id_list){
-    console.log('\nMake the corresponding rawdata treated...');
-    var promises = [];
-    for (var id in location_id_list){
-        promises.push(_labelRawdataSenzed('UserLocation', location_id_list[id]));
-    }
-    for (var id in motion_id_list){
-        promises.push(_labelRawdataSenzed('UserMotion', motion_id_list[id]));
-    }
-    for (var id in sound_id_list){
-        promises.push(_labelRawdataSenzed('UserSound',sound_id_list[id]));
-    }
-    return AV.Promise.when(promises);
-};
-
-exports.addSenz = function (location_obj_id, motion_obj_id, sound_obj_id, timestamp){
-    console.log('\nAdding new generated senz to database...');
+var _addSenz = function (location_obj_id, motion_obj_id, sound_obj_id, timestamp){
+    console.log('At Unix time ' + timestamp + '\n* motion id: ' + motion_obj_id + '\n* location id: ' + location_obj_id + '\n* sound id: ' + sound_obj_id);
     var promise = new AV.Promise();
     var Senz = AV.Object.extend('UserSenz');
     var senz = new Senz();
@@ -97,16 +75,55 @@ exports.addSenz = function (location_obj_id, motion_obj_id, sound_obj_id, timest
     senz.set('timestamp', timestamp);
     senz.save().then(
         function (senz){
-            console.log('New Senz object created with objectId: ' + senz.id);
+            console.log('  New Senz object created with objectId: ' + senz.id);
             promise.resolve(senz.id);
         },
         function (senz, error_info) {
-            console.log('Failed to create new Senz object, with error code: ' + error.message);
+            console.log('  Failed to create new Senz object, with error code: ' + JSON.stringify(error_info, null, 4));
             promise.reject(error_info);
         }
     );
     return promise;
 };
+
+exports.getUntreatedRawdata = function (){
+    console.log('\nRetrieving untreated data...');
+    return AV.Promise.when(
+        _getUntreatedData('UserLocation'),
+        _getUntreatedData('UserMotion'),
+        _getUntreatedData('UserSound')
+    );
+};
+
+exports.labelRawdataSenzed = function (location_id_list, motion_id_list, sound_id_list){
+    console.log('\nMake the corresponding rawdata treated...');
+    console.log('The location id list: \n'+ location_id_list + '\nThe motion id list: \n' + motion_id_list + '\nThe sound id list: \n' + sound_id_list);
+    var promises = [];
+    for (var id in location_id_list){
+        promises.push(_labelRawdataSenzed('UserLocation', location_id_list[id]));
+    }
+    for (var id in motion_id_list){
+        promises.push(_labelRawdataSenzed('UserMotion', motion_id_list[id]));
+    }
+    for (var id in sound_id_list){
+        promises.push(_labelRawdataSenzed('UserSound',sound_id_list[id]));
+    }
+    return AV.Promise.all(promises);
+};
+
+exports.addSenz = function (senz_list){
+    console.log('\nAdding new generated senzes to database...');
+    var promises = [];
+    for (var senz_tuple in senz_list){
+        var location_id = senz_list[senz_tuple]['location']['objectId'];
+        var motion_id = senz_list[senz_tuple]['motion']['objectId'];
+        var sound_id = senz_list[senz_tuple]['sound']['objectId'];
+        var timestamp = senz_list[senz_tuple][config.collector_primary_key]['timestamp'];
+        promises.push(_addSenz(location_id, motion_id, sound_id, timestamp));
+    }
+    return AV.Promise.all(promises);
+};
+
 
 
 
