@@ -130,6 +130,7 @@ exports.labelRawdataSenzed = function (location_id_list, motion_id_list, sound_i
     return AV.Promise.all(promises);
 };
 
+// For one user.
 exports.addSenz = function (user, senz_list){
     console.log('\nAdding new generated senzes to database...');
     console.log('------------------------------------------');

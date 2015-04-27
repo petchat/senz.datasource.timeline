@@ -4,7 +4,7 @@
 var req = require('request');
 var config = require('cloud/config.js');
 
-
+// For one user.
 exports.senzCollector = function (data){
     var user = data.user;
     delete data.user;
@@ -24,7 +24,5 @@ exports.senzCollector = function (data){
     });
     return promise;
 };
-
-
 
 
