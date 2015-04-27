@@ -55,4 +55,6 @@ exports.senzCluster = function (){
     );
 };
 
-exports.
+exports.senzAccumulation = function (){
+
+};

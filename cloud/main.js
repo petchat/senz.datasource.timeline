@@ -6,3 +6,4 @@ AV.Cloud.define("SenzClusterDebug", function (request, response){
     method.senzCluster();
     response.success("Senz Cluster");
 });
+
