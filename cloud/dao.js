@@ -12,16 +12,24 @@ var _getUntreatedData = function (UserRawdata){
         function (result) {
             console.log('From ' + UserRawdata);
             console.log('Successfully retrieved ' + result.length + ' untreated raw data.');
-            var untreatedData = [];
+            var untreatedData = new Object();
             for (var i = 0; i < result.length; i++) {
+                var user = result[i].get('user').id;
+                if (!(user in untreatedData)){
+                    // Add the new user to the global user id list
+                    config.user_list[UserRawdata].push(user);
+                    untreatedData[user] = new Array();
+                }
+                console.log('Find the user ' + user + ' data');
                 var data = {
                     'objectId': result[i].id,
                     'rawdataId': result[i].get('userRawdataId'),
                     'timestamp': result[i].get('timestamp')
                 };
                 console.log('* id: ' + result[i].id + '\n  timestamp: ' + result[i].get('timestamp'));
-                untreatedData.push(data);
+                untreatedData[user].push(data);
             }
+            console.log('untreated data content is:\n' + JSON.stringify(untreatedData, null, 4));
             promise.resolve(untreatedData);
         },
         function (error_info) {
@@ -54,32 +62,41 @@ var _labelRawdataSenzed = function (UserRawdata, rawdata_id){
                 }
             );
         },
-        error: function(object, error_info){
+        error: function(error_info){
             console.log('Error occurs! ' + error_info.code + ' ' + error_info.message);
         }
     });
     return promise;
 };
 
-var _addSenz = function (location_obj_id, motion_obj_id, sound_obj_id, timestamp){
-    console.log('At Unix time ' + timestamp + '\n* motion id: ' + motion_obj_id + '\n* location id: ' + location_obj_id + '\n* sound id: ' + sound_obj_id);
+var _addSenz = function (user_id, location_obj_id, motion_obj_id, sound_obj_id, timestamp){
+    console.log('At Unix time ' + timestamp + ' for the user ' + user_id + '\n* motion id: ' + motion_obj_id + '\n* location id: ' + location_obj_id + '\n* sound id: ' + sound_obj_id);
     var promise = new AV.Promise();
     var Senz = AV.Object.extend('UserSenz');
     var senz = new Senz();
-    var motion_pointer = AV.Object.createWithoutData('UserMotion', motion_obj_id);
-    var sound_pointer = AV.Object.createWithoutData('UserSound', sound_obj_id);
+    var motion_pointer   = AV.Object.createWithoutData('UserMotion', motion_obj_id);
+    var sound_pointer    = AV.Object.createWithoutData('UserSound', sound_obj_id);
     var location_pointer = AV.Object.createWithoutData('UserLocation', location_obj_id);
+    var user_pointer     = AV.Object.createWithoutData('_User', user_id);
     senz.set('userMotion', motion_pointer);
     senz.set('userLocation', location_pointer);
     senz.set('userSound', sound_pointer);
+    senz.set('user', user_pointer);
     senz.set('timestamp', timestamp);
     senz.save().then(
         function (senz){
             console.log('  New Senz object created with objectId: ' + senz.id);
-            promise.resolve(senz.id);
+            var result = {
+                'user_id': user_id,
+                'senz_id': senz.id,
+                'location_id': location_obj_id,
+                'motion_id': motion_obj_id,
+                'sound_id': sound_obj_id
+            };
+            promise.resolve(result);
         },
-        function (senz, error_info) {
-            console.log('  Failed to create new Senz object, with error code: ' + JSON.stringify(error_info, null, 4));
+        function (error_info) {
+            console.log('  Failed to create new Senz object, with error code: ' + error_info.code + ' ' + error_info.message);
             promise.reject(error_info);
         }
     );
@@ -88,6 +105,7 @@ var _addSenz = function (location_obj_id, motion_obj_id, sound_obj_id, timestamp
 
 exports.getUntreatedRawdata = function (){
     console.log('\nRetrieving untreated data...');
+    console.log('------------------------------------------');
     return AV.Promise.when(
         _getUntreatedData('UserLocation'),
         _getUntreatedData('UserMotion'),
@@ -97,8 +115,9 @@ exports.getUntreatedRawdata = function (){
 
 exports.labelRawdataSenzed = function (location_id_list, motion_id_list, sound_id_list){
     console.log('\nMake the corresponding rawdata treated...');
+    console.log('------------------------------------------');
     console.log('The location id list: \n'+ location_id_list + '\nThe motion id list: \n' + motion_id_list + '\nThe sound id list: \n' + sound_id_list);
-    var promises = [];
+    var promises = new Array();
     for (var id in location_id_list){
         promises.push(_labelRawdataSenzed('UserLocation', location_id_list[id]));
     }
@@ -111,15 +130,17 @@ exports.labelRawdataSenzed = function (location_id_list, motion_id_list, sound_i
     return AV.Promise.all(promises);
 };
 
-exports.addSenz = function (senz_list){
+exports.addSenz = function (user, senz_list){
     console.log('\nAdding new generated senzes to database...');
-    var promises = [];
+    console.log('------------------------------------------');
+    var promises = new Array();
+    var user_id  = user;
     for (var senz_tuple in senz_list){
         var location_id = senz_list[senz_tuple]['location']['objectId'];
         var motion_id = senz_list[senz_tuple]['motion']['objectId'];
         var sound_id = senz_list[senz_tuple]['sound']['objectId'];
         var timestamp = senz_list[senz_tuple][config.collector_primary_key]['timestamp'];
-        promises.push(_addSenz(location_id, motion_id, sound_id, timestamp));
+        promises.push(_addSenz(user_id, location_id, motion_id, sound_id, timestamp));
     }
     return AV.Promise.all(promises);
 };
