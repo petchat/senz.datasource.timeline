@@ -13,6 +13,6 @@ dao.getUserRawBehavior('553e0e83e4b06b192e99bf3a', 1429588400035, 1429588400038)
     function (behavior_result){
         var behavior = behavior_result['behavior'];
         console.log(behavior.length);
-        util.refineUserBehavior(behavior, '');
+        util.refineUserBehavior(behavior, 'tenMinScale');
     }
 );

@@ -67,21 +67,21 @@ exports.refineUserBehavior = function (behavior, scale){
         scale_bucket = new Array(24);
     }
     // Initiation of the senz list in any bucket.
-    scale_bucket.forEach(function (senz_list){
-        senz_list = new Array();
-    });
+    for (var i=0; i<scale_bucket.length; i++){
+        scale_bucket[i] = new Array();
+    }
     //
     behavior.forEach(function (senz){
         scale_bucket[senz[scale]].push(senz);
     });
-
+    console.log(scale_bucket);
+    //
     scale_bucket.forEach(function (senz_list){
         if (senz_list.length != 0){
             senz_list.forEach(function (senz){
-                
+
             });
         }
     });
-
 
 };
