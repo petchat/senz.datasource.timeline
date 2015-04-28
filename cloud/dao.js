@@ -1,20 +1,24 @@
 /**
  * Created by woodie on 4/23/15.
  */
-config = require('cloud/config.js');
+var config = require('cloud/config.js');
+var util   = require('cloud/util.js');
 
+
+// Basic Data Access Operation:
+//-----------------------------
 var _getUntreatedData = function (UserRawdata){
     var promise = new AV.Promise();
     var user_rawdata = AV.Object.extend(UserRawdata);
     var query = new AV.Query(user_rawdata);
     query.equalTo('processStatus', 'untreated');
     query.find().then(
-        function (result) {
+        function (results){
             console.log('From ' + UserRawdata);
-            console.log('Successfully retrieved ' + result.length + ' untreated raw data.');
+            console.log('Successfully retrieved ' + results.length + ' untreated raw data.');
             var untreatedData = new Object();
-            for (var i = 0; i < result.length; i++) {
-                var user = result[i].get('user').id;
+            results.forEach(function (result){
+                var user = result.get('user').id;
                 if (!(user in untreatedData)){
                     // Add the new user to the global user id list
                     config.user_list[UserRawdata].push(user);
@@ -22,17 +26,17 @@ var _getUntreatedData = function (UserRawdata){
                 }
                 console.log('Find the user ' + user + ' data');
                 var data = {
-                    'objectId': result[i].id,
-                    'rawdataId': result[i].get('userRawdataId'),
-                    'timestamp': result[i].get('timestamp')
+                    'objectId': result.id,
+                    'rawdataId': result.get('userRawdataId'),
+                    'timestamp': result.get('timestamp')
                 };
-                console.log('* id: ' + result[i].id + '\n  timestamp: ' + result[i].get('timestamp'));
+                console.log('* id: ' + result.id + '\n  timestamp: ' + result.get('timestamp'));
                 untreatedData[user].push(data);
-            }
+            });
             console.log('untreated data content is:\n' + JSON.stringify(untreatedData, null, 4));
             promise.resolve(untreatedData);
         },
-        function (error_info) {
+        function (error_info){
             console.log('  Error occurs! ' + error_info.code + ' ' + error_info.message);
             promise.reject(error_info);
         }
@@ -70,7 +74,13 @@ var _labelRawdataSenzed = function (UserRawdata, rawdata_id){
 };
 
 var _addSenz = function (user_id, location_obj_id, motion_obj_id, sound_obj_id, timestamp){
-    console.log('At Unix time ' + timestamp + ' for the user ' + user_id + '\n* motion id: ' + motion_obj_id + '\n* location id: ' + location_obj_id + '\n* sound id: ' + sound_obj_id);
+    console.log(
+        'At Unix time ' + new Date(timestamp)
+        + '\nfor the user ' + user_id
+        + '\n* motion id: ' + motion_obj_id
+        + '\n* location id: ' + location_obj_id
+        + '\n* sound id: ' + sound_obj_id
+    );
     var promise = new AV.Promise();
     var Senz = AV.Object.extend('UserSenz');
     var senz = new Senz();
@@ -83,6 +93,10 @@ var _addSenz = function (user_id, location_obj_id, motion_obj_id, sound_obj_id, 
     senz.set('userSound', sound_pointer);
     senz.set('user', user_pointer);
     senz.set('timestamp', timestamp);
+    // Set the senz's time zone.
+    senz.set('tenMinScale', util.calculateTimeZone(timestamp, 'tenMinScale'));
+    senz.set('halfHourScale', util.calculateTimeZone(timestamp, 'halfHourScale'));
+    senz.set('perHourScale', util.calculateTimeZone(timestamp, 'perHourScale'));
     senz.save().then(
         function (senz){
             console.log('  New Senz object created with objectId: ' + senz.id);
@@ -116,36 +130,85 @@ exports.getUntreatedRawdata = function (){
 exports.labelRawdataSenzed = function (location_id_list, motion_id_list, sound_id_list){
     console.log('\nMake the corresponding rawdata treated...');
     console.log('------------------------------------------');
-    console.log('The location id list: \n'+ location_id_list + '\nThe motion id list: \n' + motion_id_list + '\nThe sound id list: \n' + sound_id_list);
+    //console.log('The location id list: \n'+ location_id_list + '\nThe motion id list: \n' + motion_id_list + '\nThe sound id list: \n' + sound_id_list);
     var promises = new Array();
-    for (var id in location_id_list){
-        promises.push(_labelRawdataSenzed('UserLocation', location_id_list[id]));
-    }
-    for (var id in motion_id_list){
-        promises.push(_labelRawdataSenzed('UserMotion', motion_id_list[id]));
-    }
-    for (var id in sound_id_list){
-        promises.push(_labelRawdataSenzed('UserSound',sound_id_list[id]));
-    }
+    location_id_list.forEach(function (id){
+        promises.push(_labelRawdataSenzed('UserLocation', id));
+    });
+    motion_id_list.forEach(function (id){
+        promises.push(_labelRawdataSenzed('UserMotion', id));
+    });
+    sound_id_list.forEach(function (id){
+        promises.push(_labelRawdataSenzed('UserSound',id));
+    });
     return AV.Promise.all(promises);
 };
 
-// For one user.
+// - For only one user.
 exports.addSenz = function (user, senz_list){
     console.log('\nAdding new generated senzes to database...');
     console.log('------------------------------------------');
     var promises = new Array();
     var user_id  = user;
-    for (var senz_tuple in senz_list){
-        var location_id = senz_list[senz_tuple]['location']['objectId'];
-        var motion_id = senz_list[senz_tuple]['motion']['objectId'];
-        var sound_id = senz_list[senz_tuple]['sound']['objectId'];
-        var timestamp = senz_list[senz_tuple][config.collector_primary_key]['timestamp'];
+    senz_list.forEach(function (senz_tuple){
+        var location_id = senz_tuple['location']['objectId'];
+        var motion_id = senz_tuple['motion']['objectId'];
+        var sound_id = senz_tuple['sound']['objectId'];
+        var timestamp = senz_tuple[config.collector_primary_key]['timestamp'];
         promises.push(_addSenz(user_id, location_id, motion_id, sound_id, timestamp));
-    }
+    });
     return AV.Promise.all(promises);
 };
 
+
+// User Behavior API:
+//-------------------
+exports.getUserRawBehavior = function (user_id, start_time, end_time){
+    console.log('\nRetrieving User ' + user_id + ' Behavior...');
+    console.log('------------------------------------------');
+    var promise = new AV.Promise();
+    var user_senz = AV.Object.extend('UserSenz');
+    var user      = AV.Object.createWithoutData('_User', user_id);
+    var query = new AV.Query(user_senz);
+    query.equalTo('user', user);
+    query.greaterThan('timestamp', start_time);
+    query.lessThan('timestamp', end_time);
+    query.limit(500);
+    query.include('userSound');
+    query.include('userLocation');
+    query.include('userMotion');
+    query.find().then(
+        function (results){
+            console.log('  Successfully retrieved ' + results.length + ' senzes in User Behavior during this period.');
+            var behavior = new Array();
+            results.forEach(function (result){
+                if (result.get('userMotion') != undefined &&
+                    result.get('userLocation') != undefined &&
+                    result.get('userSound') != undefined) {
+                    var data = {
+                        'senzId': result.id,
+                        'motionType': result.get('userMotion')['attributes']['motionType'],
+                        'poiType': result.get('userLocation')['attributes']['poiType'],
+                        'soundType': result.get('userSound')['attributes']['soundType'],
+                        'tenMinScale': result.get('tenMinScale'),
+                        'halfHourScale': result.get('halfHourScale'),
+                        'perHourScale': result.get('perHourScale'),
+                        'timestamp': result.get('timestamp')
+                    };
+                    behavior.push(data);
+                }
+            });
+            var user_behavior = new Object({'user': user_id, 'behavior': behavior});
+            console.log('  The result is:\n' + JSON.stringify(user_behavior, null, 4));
+            promise.resolve(user_behavior);
+        },
+        function (error_info){
+            console.log('  Error occurs! ' + error_info.code + ' ' + error_info.message);
+            promise.reject(error_info);
+        }
+    );
+    return promise;
+};
 
 
 

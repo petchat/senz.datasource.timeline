@@ -2,34 +2,86 @@
  * Created by woodie on 4/26/15.
  */
 
-var inArray = function (element, array){
-    for (index in array){
-        if (array[index] == element){
-            return true;
-        }
-    }
-    return false;
-};
-
 exports.extractRawdataIdFromSenzList = function (rawdata_type, senz_list){
-    var rawdata_id_list = new Array();
-    for (var user in senz_list){
-        for (var senz in senz_list[user]){
-            rawdata_id_list.push(senz_list[user][senz][rawdata_type]);
-        }
-    }
+    var rawdata_id_list = new Set();
+    senz_list.forEach(function (user){
+        user.forEach(function (senz){
+            rawdata_id_list.add(senz[rawdata_type]);
+        });
+    });
     return rawdata_id_list;
 };
 
 
 exports.universalUsersSet = function (users_sets){
-    var universal_set = new Array();
-    for (users_set in users_sets){
-        for (user in users_sets[users_set]){
-            if (!inArray(users_sets[users_set][user], universal_set)){
-                universal_set.push(users_sets[users_set][user]);
-            }
-        }
+    var universal_set = new Set();
+    for (users_set in users_sets) {
+        users_sets[users_set].forEach(function (user) {
+            universal_set.add(user);
+        });
     }
     return universal_set;
+};
+
+// time_zone_type:
+// - tenMinScale
+// - halfHourScale
+// - perHourScale
+exports.calculateTimeZone = function (the_unix_time, time_zone_type){
+    var the_time = new Date(the_unix_time);
+    var year     = the_time.getFullYear();
+    var month    = the_time.getMonth();
+    var date     = the_time.getDate();
+    // Set the start time of this day.
+    var the_day  = new Date();
+    the_day.setFullYear(year);the_day.setMonth(month);the_day.setDate(date);
+    the_day.setHours(0);the_day.setMinutes(0);the_day.setSeconds(0);the_day.setMilliseconds(0);
+    // Calculate interval time.
+    var interval_time  = the_time - the_day;
+    // Set the time zone.
+    if (time_zone_type == 'tenMinScale'){
+        return Math.floor(interval_time / (1000*60*10));
+    }
+    else if (time_zone_type == 'halfHourScale'){
+        return Math.floor(interval_time / (1000*60*30));
+    }
+    else if (time_zone_type == 'perHourScale'){
+        return Math.floor(interval_time / (1000*60*60));
+    }
+    else{
+        console.log('Calculate Time Zone: There is default time zone selected.');
+        return Math.floor(interval_time / (1000*60));
+    }
+};
+
+exports.refineUserBehavior = function (behavior, scale){
+    var scale_bucket;
+    // Initiation of Scale Bucket.
+    if (scale == 'tenMinScale'){
+        scale_bucket = new Array(24*6);
+    }
+    else if (scale == 'halfHourScale'){
+        scale_bucket = new Array(24*2);
+    }
+    else if (scale == 'perHourScale'){
+        scale_bucket = new Array(24);
+    }
+    // Initiation of the senz list in any bucket.
+    scale_bucket.forEach(function (senz_list){
+        senz_list = new Array();
+    });
+    //
+    behavior.forEach(function (senz){
+        scale_bucket[senz[scale]].push(senz);
+    });
+
+    scale_bucket.forEach(function (senz_list){
+        if (senz_list.length != 0){
+            senz_list.forEach(function (senz){
+                
+            });
+        }
+    });
+
+
 };
