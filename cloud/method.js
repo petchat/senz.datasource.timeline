@@ -7,10 +7,10 @@ var config = require('cloud/config.js');
 var util   = require('cloud/util.js');
 
 
-exports.senzCluster = function (){
+exports.senzCluster = function (is_training){
     console.log('Senz Cluster\n============');
     // Get untreated data from LeanCloud.
-    return dao.getUntreatedRawdata().then(
+    return dao.getUntreatedRawdata(is_training).then(
         // Request the senz collector with untreated data
         // to get the list of senz tuples.
         function (user_location_list, user_motion_list, user_sound_list){
@@ -19,7 +19,7 @@ exports.senzCluster = function (){
             users_list.forEach(function (user){
                 request_data = {
                     "user": user,
-                    "filter": 1,
+                    "filter": 1000*120,
                     "timelines": {
                         'location': user_location_list[user],
                         'motion': user_motion_list[user],
@@ -36,7 +36,7 @@ exports.senzCluster = function (){
         function (senz_list){
             var promises = new Array();
             senz_list.forEach(function (user_result){
-                promises.push(dao.addSenz(user_result.user, user_result.result));
+                promises.push(dao.addSenz(user_result.user, user_result.result, is_training));
             });
             return AV.Promise.all(promises);
         }

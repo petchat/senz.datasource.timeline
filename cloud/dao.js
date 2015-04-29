@@ -7,11 +7,12 @@ var util   = require('cloud/util.js');
 
 // Basic Data Access Operation:
 //-----------------------------
-var _getUntreatedData = function (UserRawdata){
+var _getUntreatedData = function (UserRawdata, is_training){
     var promise = new AV.Promise();
     var user_rawdata = AV.Object.extend(UserRawdata);
     var query = new AV.Query(user_rawdata);
     query.equalTo('processStatus', 'untreated');
+    query.equalTo('isTrainingSample', is_training);
     query.find().then(
         function (results){
             console.log('From ' + UserRawdata);
@@ -73,7 +74,7 @@ var _labelRawdataSenzed = function (UserRawdata, rawdata_id){
     return promise;
 };
 
-var _addSenz = function (user_id, location_obj_id, motion_obj_id, sound_obj_id, timestamp){
+var _addSenz = function (user_id, location_obj_id, motion_obj_id, sound_obj_id, timestamp, is_training){
     console.log(
         'At Unix time ' + new Date(timestamp)
         + '\nfor the user ' + user_id
@@ -93,6 +94,7 @@ var _addSenz = function (user_id, location_obj_id, motion_obj_id, sound_obj_id, 
     senz.set('userSound', sound_pointer);
     senz.set('user', user_pointer);
     senz.set('timestamp', timestamp);
+    senz.set('isTrainingSample', is_training);
     // Set the senz's time zone.
     senz.set('tenMinScale', util.calculateTimeZone(timestamp, 'tenMinScale'));
     senz.set('halfHourScale', util.calculateTimeZone(timestamp, 'halfHourScale'));
@@ -117,13 +119,13 @@ var _addSenz = function (user_id, location_obj_id, motion_obj_id, sound_obj_id, 
     return promise;
 };
 
-exports.getUntreatedRawdata = function (){
+exports.getUntreatedRawdata = function (is_training){
     console.log('\nRetrieving untreated data...');
     console.log('------------------------------------------');
     return AV.Promise.when(
-        _getUntreatedData('UserLocation'),
-        _getUntreatedData('UserMotion'),
-        _getUntreatedData('UserSound')
+        _getUntreatedData('UserLocation', is_training),
+        _getUntreatedData('UserMotion', is_training),
+        _getUntreatedData('UserSound', is_training)
     );
 };
 
@@ -145,7 +147,7 @@ exports.labelRawdataSenzed = function (location_id_list, motion_id_list, sound_i
 };
 
 // - For only one user.
-exports.addSenz = function (user, senz_list){
+exports.addSenz = function (user, senz_list, is_training){
     console.log('\nAdding new generated senzes to database...');
     console.log('------------------------------------------');
     var promises = new Array();
@@ -155,7 +157,7 @@ exports.addSenz = function (user, senz_list){
         var motion_id = senz_tuple['motion']['objectId'];
         var sound_id = senz_tuple['sound']['objectId'];
         var timestamp = senz_tuple[config.collector_primary_key]['timestamp'];
-        promises.push(_addSenz(user_id, location_id, motion_id, sound_id, timestamp));
+        promises.push(_addSenz(user_id, location_id, motion_id, sound_id, timestamp, is_training));
     });
     return AV.Promise.all(promises);
 };
@@ -163,7 +165,7 @@ exports.addSenz = function (user, senz_list){
 
 // User Behavior API:
 //-------------------
-exports.getUserRawBehavior = function (user_id, start_time, end_time){
+exports.getUserRawBehavior = function (user_id, start_time, end_time, is_training){
     console.log('\nRetrieving User ' + user_id + ' Behavior...');
     console.log('------------------------------------------');
     var promise = new AV.Promise();
@@ -171,6 +173,7 @@ exports.getUserRawBehavior = function (user_id, start_time, end_time){
     var user      = AV.Object.createWithoutData('_User', user_id);
     var query = new AV.Query(user_senz);
     query.equalTo('user', user);
+    query.equalTo('isTrainingSample', is_training);
     query.greaterThan('timestamp', start_time);
     query.lessThan('timestamp', end_time);
     query.limit(500);
