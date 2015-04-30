@@ -12,7 +12,8 @@ exports.user_list = {
 // The request url
 exports.url = {
     'test_url': 'http://httpbin.org/post',
-    'local_debug_url': 'http://127.0.0.1:9009/',
-    'collector_url': '',
+    'local_debug_url': 'http://127.0.0.1:9009/collector/',
+    'senz_collector_url': 'http://127.0.0.1:9009/senz_collector/',
+    'behavior_collector_url': 'http://127.0.0.1:9010/behavior_collector/',
     'analyser_url': ''
 };

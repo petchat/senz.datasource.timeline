@@ -53,35 +53,3 @@ exports.calculateTimeZone = function (the_unix_time, time_zone_type){
         return Math.floor(interval_time / (1000*60));
     }
 };
-
-exports.refineUserBehavior = function (behavior, scale){
-    var scale_bucket;
-    // Initiation of Scale Bucket.
-    if (scale == 'tenMinScale'){
-        scale_bucket = new Array(24*6);
-    }
-    else if (scale == 'halfHourScale'){
-        scale_bucket = new Array(24*2);
-    }
-    else if (scale == 'perHourScale'){
-        scale_bucket = new Array(24);
-    }
-    // Initiation of the senz list in any bucket.
-    for (var i=0; i<scale_bucket.length; i++){
-        scale_bucket[i] = new Array();
-    }
-    //
-    behavior.forEach(function (senz){
-        scale_bucket[senz[scale]].push(senz);
-    });
-    console.log(scale_bucket);
-    //
-    scale_bucket.forEach(function (senz_list){
-        if (senz_list.length != 0){
-            senz_list.forEach(function (senz){
-
-            });
-        }
-    });
-
-};

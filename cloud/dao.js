@@ -202,7 +202,7 @@ exports.getUserRawBehavior = function (user_id, start_time, end_time, is_trainin
                 }
             });
             var user_behavior = new Object({'user': user_id, 'behavior': behavior});
-            console.log('  The result is:\n' + JSON.stringify(user_behavior, null, 4));
+            //console.log('  The result is:\n' + JSON.stringify(user_behavior, null, 4));
             promise.resolve(user_behavior);
         },
         function (error_info){
@@ -213,6 +213,40 @@ exports.getUserRawBehavior = function (user_id, start_time, end_time, is_trainin
     return promise;
 };
 
+
+exports.addBehavior = function (user_id ,behavior_data, senz_id_list){
+    console.log('\nAdding new generated behavior to database...');
+    console.log('------------------------------------------');
+    var promise = new AV.Promise();
+
+    var Behavior = AV.Object.extend('UserBehavior');
+    var behavior = new Behavior();
+
+    var related_senzes = new Array();
+    senz_id_list.forEach(function (senz_id){
+        related_senzes.push(AV.Object.createWithoutData("UserSenz", senz_id));
+    });
+    var user_pointer = AV.Object.createWithoutData('_User', user_id);
+    var relation = behavior.relation("relatedSenzes");
+    var timestamp = new Date();
+
+    behavior.set('behaviorData', behavior_data);
+    behavior.set('user', user_pointer);
+    behavior.set('startTime', behavior_data[0]['timestamp']);
+    behavior.set('endTime', behavior_data[behavior_data.length - 1]['timestamp']);
+    relation.add(related_senzes);
+    behavior.save().then(
+        function (behavior){
+            console.log('  New Behavior object created with objectId: ' + behavior.id);
+            promise.resolve(behavior.id);
+        },
+        function (error_info) {
+            console.log('  Failed to create new Behavior object, with error code: ' + error_info.code + ' ' + error_info.message);
+            promise.reject(error_info);
+        }
+    );
+    return promise;
+};
 
 
 

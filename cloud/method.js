@@ -7,8 +7,8 @@ var config = require('cloud/config.js');
 var util   = require('cloud/util.js');
 
 
-exports.senzCluster = function (is_training){
-    console.log('Senz Cluster\n============');
+exports.senzGenerator = function (is_training){
+    console.log('Senz Generating...\n============');
     // Get untreated data from LeanCloud.
     return dao.getUntreatedRawdata(is_training).then(
         // Request the senz collector with untreated data
@@ -56,6 +56,24 @@ exports.senzCluster = function (is_training){
     );
 };
 
-exports.senzAccumulation = function (){
-
+exports.behaviorGenerator = function (user_id, start_time, end_time, scale){
+    console.log('Behavior Generating...\n============');
+    var senz_id_list = new Array();
+    return dao.getUserRawBehavior(user_id, start_time, end_time).then(
+        function (behavior_result){
+            var behavior = behavior_result['behavior'];
+            behavior.forEach(function (senz){
+                senz_id_list.push(senz['senzId']);
+            });
+            //console.log(behavior.length);
+            return algo.refineUserBehavior(behavior, scale);
+        }
+    ).then(
+        function (behavior_refined){
+            console.log('The generated refined behavior is');
+            console.log(behavior_refined);
+            //console.log(senz_id_list.length);
+            dao.addBehavior(user_id, behavior_refined, senz_id_list);
+        }
+    );
 };

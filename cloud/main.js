@@ -2,17 +2,16 @@
 // For example:
 var method = require('cloud/method.js');
 var dao    = require('cloud/dao.js');
-var util   = require('cloud/util.js');
+var algo   = require('cloud/algo.js');
 
-AV.Cloud.define("SenzClusterDebug", function (request, response){
-    method.senzCluster(0);
-    response.success("Senz Cluster");
+AV.Cloud.define('SenzGeneratorDebug', function (request, response){
+    method.senzGenerator(0);
+    response.success('Senz Generator');
 });
 
-//dao.getUserRawBehavior('553e0e83e4b06b192e99bf3a', 1429588400035, 1429588400038).then(
-//    function (behavior_result){
-//        var behavior = behavior_result['behavior'];
-//        console.log(behavior.length);
-//        util.refineUserBehavior(behavior, 'tenMinScale');
-//    }
-//);
+AV.Cloud.define('BehaviorGeneratorDebug', function (request, response){
+    method.behaviorGenerator('553e0e83e4b06b192e99bf3a', 1429588400035, 1429588400038, 'tenMinScale');
+    response.success('Behavior Generator');
+});
+
+//'553e0e83e4b06b192e99bf3a', 1429588400035, 1429588400038
