@@ -214,7 +214,7 @@ exports.getUserRawBehavior = function (user_id, start_time, end_time, is_trainin
 };
 
 
-exports.addBehavior = function (user_id ,behavior_data, senz_id_list){
+exports.addBehavior = function (user_id ,behavior_data, day_type, senz_id_list){
     console.log('\nAdding new generated behavior to database...');
     console.log('------------------------------------------');
     var promise = new AV.Promise();
@@ -234,6 +234,7 @@ exports.addBehavior = function (user_id ,behavior_data, senz_id_list){
     behavior.set('user', user_pointer);
     behavior.set('startTime', behavior_data[0]['timestamp']);
     behavior.set('endTime', behavior_data[behavior_data.length - 1]['timestamp']);
+    behavior.set('dayType', day_type);
     relation.add(related_senzes);
     behavior.save().then(
         function (behavior){

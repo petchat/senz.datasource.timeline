@@ -7,7 +7,7 @@ var config = require('cloud/config.js');
 // Input is a list of senz with the same scale value.
 // And it will return a single senz tuple,
 // which timestamp is the average of the list of senz, and sensor result is the result of analysing in some strategy.
-var behaviorCollector = function (data){
+var refineSenz = function (data){
     var promise = new AV.Promise();
     req.post(
         {
@@ -17,8 +17,8 @@ var behaviorCollector = function (data){
         function (err, httpResponse, body){
             console.log('  Received result successfully.');
             //console.log('The content of result is:\n' + JSON.stringify(body, null, 4));
-            var result = body['result'];
-            promise.resolve(result);
+            //var result = body['result'];
+            promise.resolve(body['result']);
         }
     );
     return promise;
@@ -48,7 +48,7 @@ exports.senzCollector = function (data){
 
 // Input is a user's behavior(a list of senz) which every scale is redundant.
 // And it will return a new behavior(a list of senz less than the former) which every scale is not more than 1.
-exports.refineUserBehavior = function (behavior, scale){
+exports.behaviorCollector = function (behavior, scale){
     var promises     = new Array();
     //var senz_id_list = new Array();
     var scale_bucket;
@@ -77,9 +77,26 @@ exports.refineUserBehavior = function (behavior, scale){
     for (var i in scale_bucket){
         if (scale_bucket[i].length != 0){
             var data = {'scale_type': scale, 'scale_value': i, 'senz_list': scale_bucket[i]};
-            promises.push(behaviorCollector(data));
+            promises.push(refineSenz(data));
         }
     }
 
     return AV.Promise.all(promises);
+};
+
+exports.timeType = function (start_time, end_time){
+    var promise = new AV.Promise();
+    req.post(
+        {
+            url:  config.url['time_type_url'],
+            json: {'start_time': start_time, 'end_time': end_time}
+        },
+        function (err, httpResponse, body){
+            console.log('Received result successfully.');
+            //console.log('The content of result is:\n' + JSON.stringify(body, null, 4));
+            var result = new Object({'result': body['result']});
+            promise.resolve(result);
+        }
+    );
+    return promise;
 };

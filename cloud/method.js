@@ -66,14 +66,14 @@ exports.behaviorGenerator = function (user_id, start_time, end_time, scale){
                 senz_id_list.push(senz['senzId']);
             });
             //console.log(behavior.length);
-            return algo.refineUserBehavior(behavior, scale);
+            return algo.behaviorCollector(behavior, scale);
         }
     ).then(
         function (behavior_refined){
             console.log('The generated refined behavior is');
             console.log(behavior_refined);
             //console.log(senz_id_list.length);
-            dao.addBehavior(user_id, behavior_refined, senz_id_list);
+            dao.addBehavior(user_id, behavior_refined, 'normal', senz_id_list);
         }
     );
 };
