@@ -9,7 +9,7 @@ AV.Cloud.define('SenzGeneratorDebug', function (request, response){
     response.success('Senz Generator');
 });
 
-AV.Cloud.define('BehaviorGenerator', function (request, response){
+AV.Cloud.define('timeline', function (request, response){
     user       = request.params.user_id;
     start_time = request.params.start_time;
     end_time   = request.params.end_time;
