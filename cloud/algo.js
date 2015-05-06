@@ -76,7 +76,8 @@ exports.behaviorCollector = function (behavior, scale){
     // Get every new senz tuple at each bucket.
     for (var i in scale_bucket){
         if (scale_bucket[i].length != 0){
-            var data = {'scale_type': scale, 'scale_value': i, 'senz_list': scale_bucket[i]};
+            var data = {"scale_type": scale, "scale_value": i, "senz_list": scale_bucket[i]};
+            console.log(data);
             promises.push(refineSenz(data));
         }
     }
@@ -89,7 +90,7 @@ exports.timeType = function (start_time, end_time){
     req.post(
         {
             url:  config.url['time_type_url'],
-            json: {'start_time': start_time, 'end_time': end_time}
+            json: {"start_time": start_time, "end_time": end_time}
         },
         function (err, httpResponse, body){
             console.log('Received result successfully.');

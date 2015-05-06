@@ -21,9 +21,9 @@ exports.senzGenerator = function (is_training){
                     "user": user,
                     "filter": 1000*120,
                     "timelines": {
-                        'location': user_location_list[user],
-                        'motion': user_motion_list[user],
-                        'sound': user_sound_list[user]
+                        "location": user_location_list[user],
+                        "motion": user_motion_list[user],
+                        "sound": user_sound_list[user]
                     },
                     "primary_key": config.collector_primary_key
                 };
@@ -56,10 +56,12 @@ exports.senzGenerator = function (is_training){
     );
 };
 
-exports.behaviorGenerator = function (user_id, start_time, end_time, scale){
+
+exports.behaviorGenerator = function (user_id, start_time, end_time, scale, is_stored){
     console.log('Behavior Generating...\n============');
     var senz_id_list = new Array();
-    return dao.getUserRawBehavior(user_id, start_time, end_time).then(
+    var promise = new AV.Promise();
+    dao.getUserRawBehavior(user_id, start_time, end_time).then(
         function (behavior_result){
             var behavior = behavior_result['behavior'];
             behavior.forEach(function (senz){
@@ -73,7 +75,18 @@ exports.behaviorGenerator = function (user_id, start_time, end_time, scale){
             console.log('The generated refined behavior is');
             console.log(behavior_refined);
             //console.log(senz_id_list.length);
-            dao.addBehavior(user_id, behavior_refined, 'normal', senz_id_list);
+            if (is_stored == true){
+                console.log('The result will be stored in LeanCloud.');
+                dao.addBehavior(user_id, behavior_refined, 'normal', senz_id_list);
+            }
+            else{
+                console.log('The result will be return.');
+                promise.resolve(behavior_refined);
+            }
+            //dao.addBehavior(user_id, behavior_refined, 'normal', senz_id_list);
         }
     );
+    return promise;
 };
+
+

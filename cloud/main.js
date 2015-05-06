@@ -9,9 +9,22 @@ AV.Cloud.define('SenzGeneratorDebug', function (request, response){
     response.success('Senz Generator');
 });
 
-AV.Cloud.define('BehaviorGeneratorDebug', function (request, response){
-    method.behaviorGenerator('553e0e83e4b06b192e99bf3a', 1429588400035, 1429588400038, 'tenMinScale');
-    response.success('Behavior Generator');
+AV.Cloud.define('BehaviorGenerator', function (request, response){
+    user       = request.params.user_id;
+    start_time = request.params.start_time;
+    end_time   = request.params.end_time;
+    scale      = request.params.time_scale;
+    console.log(user);
+    console.log(start_time);
+    console.log(end_time);
+    console.log(scale);
+    //method.behaviorGenerator('s', 1429588400035, 1429588400038, 'tenMinScale');
+    method.behaviorGenerator(user, start_time, end_time, scale, false).then(
+        function (behavior_refined){
+            response.success(behavior_refined);
+        }
+    );
+    //response.success('Behavior Generator');
 });
 
 //'553e0e83e4b06b192e99bf3a', 1429588400035, 1429588400038
