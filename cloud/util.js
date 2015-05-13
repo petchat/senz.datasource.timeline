@@ -2,7 +2,7 @@
  * Created by woodie on 4/26/15.
  */
 
-exports.extractRawdataIdFromSenzList = function (rawdata_type, senz_list){
+exports.bindRawdataIdFromSenzList = function (rawdata_type, senz_list){
     var rawdata_id_list = new Set();
     senz_list.forEach(function (user){
         user.forEach(function (senz){
@@ -13,7 +13,7 @@ exports.extractRawdataIdFromSenzList = function (rawdata_type, senz_list){
 };
 
 
-exports.universalUsersSet = function (users_sets){
+exports.uniqueUsersSet = function (users_sets){
     var universal_set = new Set();
     for (users_set in users_sets) {
         users_sets[users_set].forEach(function (user) {
