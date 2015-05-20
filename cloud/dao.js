@@ -17,13 +17,13 @@ var _getUnbindData = function (UserRawdata, is_training) {
         function (results) {
             console.log('From ' + UserRawdata);
             console.log('Successfully retrieved ' + results.length + ' untreated raw data.');
-            var untreatedData = new Object();
+            var untreatedData = {};
             results.forEach(function (result) {
                 var user = result.get('user').id;
                 if (!(user in untreatedData)) {
                     // Add the new user to the global user id list
                     config.user_list[UserRawdata].push(user);
-                    untreatedData[user] = new Array();
+                    untreatedData[user] = [];
                 }
                 console.log('Find the user ' + user + ' data');
                 var data = {
@@ -54,12 +54,12 @@ var _completeRawdataBinding = function (UserRawdata, rawdata_id) {
         success: function (userRawdata) {
             var date = new Date();
             // *** HERE NEED TO REVISE THE PROCESS STATUS TO SENZED ***
-            userRawdata.set('processStatus', 'processed');
+            userRawdata.set('processStatus', 'untreated');
             userRawdata.set('senzedAt', date);
             userRawdata.save().then(
                 function (obj) {
                     console.log('  Update status successfully!');
-                    promise.resolve(obj);
+                    promise.resolve(obj.id);
                 },
                 function (error_info) {
                     console.log('  Failed to update status, with error code: ' + error_info.message);
@@ -134,7 +134,7 @@ exports.completeRawdataBinding = function (location_id_list, motion_id_list, sou
     console.log('\nMake the corresponding rawdata treated...');
     console.log('------------------------------------------');
     //console.log('The location id list: \n'+ location_id_list + '\nThe motion id list: \n' + motion_id_list + '\nThe sound id list: \n' + sound_id_list);
-    var promises = new Array();
+    var promises = [];
     location_id_list.forEach(function (id) {
         promises.push(_completeRawdataBinding('UserLocation', id));
     });
@@ -151,7 +151,7 @@ exports.completeRawdataBinding = function (location_id_list, motion_id_list, sou
 exports.addSenz = function (user, senz_list, is_training) {
     console.log('\nAdding new generated senzes to database...');
     console.log('------------------------------------------');
-    var promises = new Array();
+    var promises = [];
     var user_id = user;
     senz_list.forEach(function (senz_tuple) {
         var location_id = senz_tuple['location']['objectId'];
@@ -184,7 +184,7 @@ exports.getUserRawBehavior = function (user_id, start_time, end_time, is_trainin
     query.find().then(
         function (results) {
             console.log('  Successfully retrieved ' + results.length + ' senzes in User Behavior during this period.');
-            var behavior = new Array();
+            var behavior = [];
             results.forEach(function (result) {
                 if (result.get('userMotion') != undefined &&
                     result.get('userLocation') != undefined &&
@@ -192,7 +192,8 @@ exports.getUserRawBehavior = function (user_id, start_time, end_time, is_trainin
                     var data = {
                         'senzId': result.id,
                         'motionProb': result.get('userMotion')['attributes']['motionProb'],
-                        'poiProb': result.get('userLocation')['attributes']['poiProb'],
+                        'poiProbLv1': result.get('userLocation')['attributes']['poiProbLv1'],
+                        'poiProbLv2': result.get('userLocation')['attributes']['poiProbLv2'],
                         'soundProb': result.get('userSound')['attributes']['soundProb'],
                         'tenMinScale': result.get('tenMinScale'),
                         'halfHourScale': result.get('halfHourScale'),
@@ -223,7 +224,7 @@ exports.addBehavior = function (user_id, behavior_data, day_type, senz_id_list) 
     var Behavior = AV.Object.extend('UserBehavior');
     var behavior = new Behavior();
 
-    var related_senzes = new Array();
+    var related_senzes = [];
     senz_id_list.forEach(function (senz_id) {
         related_senzes.push(AV.Object.createWithoutData("UserSenz", senz_id));
     });

@@ -5,7 +5,7 @@ var dao = require('cloud/dao.js');
 var algo = require('cloud/algo.js');
 
 AV.Cloud.define('senzGeneratorDebug', function (request, response) {
-    method.senzGenerator(0)
+    method.senzGenerator(1)
         .then(function (bindedSenzes) {
             //response.success('rawsenz generated,' + bindedSenzes.length);
             response.success({

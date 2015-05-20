@@ -14,7 +14,7 @@ exports.senzGenerator = function (is_training) {
         // to get the list of senz tuples.
         function (user_location_list, user_motion_list, user_sound_list) {
             var users_list = util.uniqueUsersSet(config.user_list);
-            var promises = new Array();
+            var promises = [];
             users_list.forEach(function (user) {
                 var request_data = {
                     "user": user,
@@ -33,7 +33,7 @@ exports.senzGenerator = function (is_training) {
     ).then(
         // Save the list of senz tuples to LeanCloud.
         function (senz_list) {
-            var promises = new Array();
+            var promises = [];
             senz_list.forEach(function (user_result) {
                 promises.push(dao.addSenz(user_result.user, user_result.result, is_training));
             });
@@ -53,7 +53,7 @@ exports.senzGenerator = function (is_training) {
 
 exports.behaviorGenerator = function (user_id, start_time, end_time, scale, is_stored) {
     console.log('Behavior Generating...\n============');
-    var senz_id_list = new Array();
+    var senz_id_list = [];
     var promise = new AV.Promise();
     dao.getUserRawBehavior(user_id, start_time, end_time).then(
         function (behavior_result) {
