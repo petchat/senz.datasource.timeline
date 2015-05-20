@@ -11,6 +11,7 @@ var _getUnbindData = function (UserRawdata, is_training) {
     var promise = new AV.Promise();
     var user_rawdata = AV.Object.extend(UserRawdata);
     var query = new AV.Query(user_rawdata);
+    query.ascending("timestamp");
     query.equalTo('processStatus', 'untreated');
     query.equalTo('isTrainingSample', is_training);
     query.find().then(

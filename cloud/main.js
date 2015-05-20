@@ -29,7 +29,7 @@ AV.Cloud.define('timeline', function (request, response) {
     console.log(end_time);
     console.log(scale);
     //method.behaviorGenerator('s', 1429588400035, 1429588400038, 'tenMinScale');
-    method.behaviorGenerator(user, start_time, end_time, scale, false).then(
+    method.behaviorGenerator(user, start_time, end_time, scale, true).then(
         function (behavior_refined) {
             response.success({
                 code: 0,
