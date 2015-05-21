@@ -55,7 +55,7 @@ exports.behaviorGenerator = function (user_id, start_time, end_time, scale, is_s
     console.log('Behavior Generating...\n============');
     var senz_id_list = [];
     var promise = new AV.Promise();
-    dao.getUserRawBehavior(user_id, start_time, end_time).then(
+    return dao.getUserRawBehavior(user_id, start_time, end_time).then(
         function (behavior_result) {
             var behavior = behavior_result['behavior'];
             behavior.forEach(function (senz) {
@@ -72,16 +72,14 @@ exports.behaviorGenerator = function (user_id, start_time, end_time, scale, is_s
             if (is_stored == true) {
                 console.log('The result will be stored in LeanCloud.');
                 return dao.addBehavior(user_id, behavior_refined, 'normal', senz_id_list);
-            } else {
+            }
+            else {
                 console.log('The result will be return.');
                 return AV.Promise.as(behavior_refined);
             }
             //dao.addBehavior(user_id, behavior_refined, 'normal', senz_id_list);
         }
-    ).then(function (behavior_refined) {
-            promise.resolve(behavior_refined);
-        });
-    return promise;
+    );
 };
 
 
