@@ -4,40 +4,42 @@ var method = require('cloud/method.js');
 var dao = require('cloud/dao.js');
 var algo = require('cloud/algo.js');
 
-AV.Cloud.define('senzGeneratorDebug', function (request, response) {
-    method.senzGenerator(1)
-        .then(function (bindedSenzes) {
+AV.Cloud.define('senz', function (request, response) {
+    var is_training = request.params.isTraining;
+
+    method.senzGenerator(is_training).then(
+        function (bindedSenzes) {
             //response.success('rawsenz generated,' + bindedSenzes.length);
             response.success({
                 code: 0,
                 result: bindedSenzes,
                 message: 'rawsenz generated.'
             })
-        }, function (err) {
+        },
+        function (err) {
             response.error(err);
         });
 });
 
-AV.Cloud.define('timeline', function (request, response) {
+AV.Cloud.define('behavior', function (request, response) {
     var user = request.params.userId,
         start_time = request.params.startTime,
         end_time = request.params.endTime,
-        scale = request.params.timeScale;
+        scale = request.params.timeScale,
+        is_store = request.params.isStore;
 
-    console.log(user);
-    console.log(start_time);
-    console.log(end_time);
-    console.log(scale);
     //method.behaviorGenerator('s', 1429588400035, 1429588400038, 'tenMinScale');
-    method.behaviorGenerator(user, start_time, end_time, scale, true).then(
+    method.behaviorGenerator(user, start_time, end_time, scale, is_store).then(
         function (behavior_refined) {
             response.success({
                 code: 0,
                 result: behavior_refined,
                 message: 'behavior generated.'
             });
+        },
+        function (err){
+            response.error(err);
         }
-        // TODO error handler
     );
 });
 
