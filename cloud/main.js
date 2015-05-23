@@ -49,8 +49,8 @@ AV.Cloud.define('behavior', function (request, response) {
 
 //var date = new Date();
 //dao.updateUserBehaviorLastUpdatedTime("553e0e83e4b06b192e99bf3a", date);
-//bp.behaviorProcess(600000000, 100000000, "tenMinScale", "553e0e83e4b06b192e99bf3a");
-var senz_list = [{"prob":-9.143328097411052,"location":"scenic_spot","motion":"driving","sound":"kitchen"},{"prob":-9.143328097411052,"location":"residence","motion":"sitting","sound":"kitchen"}];
-algo.predict("GMMHMM", "random_generated_base_model", senz_list).then(function (res){
-    console.log(res);
-});
+bp.behaviorProcess(600000000, 100000000, "tenMinScale", "553e0e83e4b06b192e99bf3a");
+//var senz_list = [{"prob":-9.143328097411052,"location":"scenic_spot","motion":"driving","sound":"kitchen"},{"prob":-9.143328097411052,"location":"residence","motion":"sitting","sound":"kitchen"}];
+//algo.predict("GMMHMM", "random_generated_base_model", senz_list).then(function (res){
+//    console.log(res);
+//});

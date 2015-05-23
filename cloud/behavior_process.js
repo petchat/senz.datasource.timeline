@@ -48,13 +48,14 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id) {
                         senz_list_result.forEach(function (senz_object) {
                             var prob = senz_object["prob"];
                             var senz_list = senz_object["senzList"];
-                            //console.log(JSON.stringify(senz_list));
                             promises.push(algo.predict("GMMHMM", "random_generated_base_model", senz_list));
                         });
                         return AV.Promise.all(promises);
                     }
                 ).then(
                     function (predict_result){
+                        // TODO some predice result is error.
+                        console.log(JSON.stringify(senz_list));
                         console.log(predict_result);
                     }
                 );

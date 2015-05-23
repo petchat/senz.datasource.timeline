@@ -136,7 +136,7 @@ exports.predict = function (algo_type, model_tag, seq){
     var promise = new AV.Promise();
     req.post(
         {
-            header: config.url["predict"]["header"],
+            headers: config.url["predict"]["header"],
             url: config.url["predict"]["url"],
             json: data
         },
