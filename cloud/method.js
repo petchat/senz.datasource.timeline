@@ -54,7 +54,7 @@ exports.senzGenerator = function (is_training) {
 exports.behaviorGenerator = function (user_id, start_time, end_time, scale, is_stored) {
     console.log('Behavior Generating...\n============');
     var senz_id_list = [];
-    var promise = new AV.Promise();
+    //var promise = new AV.Promise();
     return dao.getUserRawBehavior(user_id, start_time, end_time).then(
         function (behavior_result) {
             var behavior = behavior_result['behavior'];
@@ -66,16 +66,21 @@ exports.behaviorGenerator = function (user_id, start_time, end_time, scale, is_s
         }
     ).then(
         function (behavior_refined) {
-            console.log('The generated refined behavior is');
-            console.log(behavior_refined);
+            //console.log('The generated refined behavior is');
+            //console.log(behavior_refined);
             //console.log(senz_id_list.length);
-            if (is_stored == true) {
-                console.log('The result will be stored in LeanCloud.');
-                return dao.addBehavior(user_id, behavior_refined, 'normal', senz_id_list);
+            if (is_stored == true && behavior_refined != undefined && behavior_refined.length >= 1) {
+                //console.log('The result will be stored in LeanCloud.');
+                return dao.addBehavior(user_id, behavior_refined, 'normal', senz_id_list, start_time, end_time);
             }
-            else {
+            else if (behavior_refined != undefined && behavior_refined.length >= 1){
                 console.log('The result will be return.');
                 return AV.Promise.as(behavior_refined);
+            }
+            else{
+                var promise = new AV.Promise();
+                promise.reject("the behavior's count is 0");
+                return promise;
             }
             //dao.addBehavior(user_id, behavior_refined, 'normal', senz_id_list);
         }

@@ -3,7 +3,6 @@
  */
 var req = require('request');
 var config = require('cloud/config.js');
-
 // Input is a list of senz with the same scale value.
 // And it will return a single senz tuple,
 // which timestamp is the average of the list of senz, and sensor result is the result of analysing in some strategy.
@@ -15,7 +14,7 @@ var refineSenz = function (data){
             json: data
         },
         function (err, httpResponse, body){
-            console.log('  Received result successfully.');
+            //console.log('  Received result successfully.');
             //console.log('The content of result is:\n' + JSON.stringify(body, null, 4));
             //var result = body['result'];
             promise.resolve(body['result']);
@@ -37,7 +36,7 @@ exports.senzCollector = function (data){
             json: data
         },
         function (err, httpResponse, body){
-            console.log('Received result successfully.');
+            //console.log('Received result successfully.');
             console.log('The content of result is:\n' + JSON.stringify(body, null, 4));
             var result = new Object({'user': user, 'result': body['result']});
             promise.resolve(result);
@@ -77,7 +76,7 @@ exports.behaviorCollector = function (behavior, scale){
     for (var i in scale_bucket){
         if (scale_bucket[i].length != 0){
             var data = {"scale_type": scale, "scale_value": i, "senz_list": scale_bucket[i]};
-            console.log(data);
+            //console.log(data);
             promises.push(refineSenz(data));
         }
     }
@@ -93,10 +92,65 @@ exports.timeType = function (start_time, end_time){
             json: {"start_time": start_time, "end_time": end_time}
         },
         function (err, httpResponse, body){
-            console.log('Received result successfully.');
+            //console.log('Received result successfully.');
             //console.log('The content of result is:\n' + JSON.stringify(body, null, 4));
             var result = new Object({'result': body['result']});
             promise.resolve(result);
+        }
+    );
+    return promise;
+};
+
+exports.prob2muti = function (prob_senz_list, strategy){
+    var data = {
+        "probSenzList": prob_senz_list,
+        "strategy": "SELECT_MAX_PROB"
+    };
+    var promise = new AV.Promise();
+    req.post(
+        {
+            url: config.url["prob_2_muti_url"],
+            json: data
+        },
+        function (err, httpResponse, body) {
+            //console.log('Received result successfully.');
+            if (body["code"] == 0) {
+                var result = body['result'];
+                promise.resolve(result);
+            }
+            else {
+                var error = body["message"];
+                promise.reject(error);
+            }
+        }
+    );
+    return promise;
+};
+
+exports.predict = function (algo_type, model_tag, seq){
+    var data = {
+        "algoType": algo_type,
+        "tag": model_tag,
+        "seq": seq
+    };
+    var promise = new AV.Promise();
+    req.post(
+        {
+            header: config.url["predict"]["header"],
+            url: config.url["predict"]["url"],
+            json: data
+        },
+        function (err, httpResponse, body) {
+            console.log(body);
+            //console.log('Received result successfully.');
+            if (body["code"] == 0) {
+                var result = body['result'];
+                promise.resolve(result);
+            }
+            else {
+                var error = body["message"];
+                promise.reject(error);
+            }
         }
     );
     return promise;
