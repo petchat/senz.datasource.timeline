@@ -136,12 +136,12 @@ exports.predict = function (algo_type, model_tag, seq){
     var promise = new AV.Promise();
     req.post(
         {
-            headers: config.url["predict"]["header"],
+            headers: config.url["predict"]["headers"],
             url: config.url["predict"]["url"],
             json: data
         },
         function (err, httpResponse, body) {
-            console.log(body);
+            //console.log(body);
             //console.log('Received result successfully.');
             if (body["code"] == 0) {
                 var result = body['result'];

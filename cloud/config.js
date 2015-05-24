@@ -28,7 +28,7 @@ exports.url = {
     "prob_2_muti_url" : "http://120.27.30.239:9044/senzlist/prob2muti/",
     "predict": {
         "url": "https://leancloud.cn/1.1/functions/classifySingleSeq/",
-        "header": {
+        "headers": {
             "X-AVOSCloud-Application-Id"  : "dkc5xdbwprsrh9809kqwopja5ckfbsrpd7dz9a30yugm9tut",
             "X-AVOSCloud-Application-Key" : "3sy9w8uwlr35xl54lja3rawyf8xjrhofxtvcwzng3blg7q31",
             "Content-Type": "application/json; charset=utf-8",
