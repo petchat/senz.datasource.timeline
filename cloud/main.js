@@ -46,19 +46,4 @@ AV.Cloud.define('behavior', function (request, response) {
 
 
 bp.behaviorProcess(600000000, 100000000, "tenMinScale", "553e0e83e4b06b192e99bf3a");
-//var test = function (){
-//    var ps = [];
-//    ps.push(AV.Promise.as("yes"));
-//    ps.push(AV.Promise.as("yes"));
-//    ps.push(AV.Promise.error("no"));
-//    return AV.Promise.when(ps);
-//};
-//var t = test();
-//t.then(
-//    function(res1, res2){
-//    },
-//    function(err){
-//        console.log(err);
-//        console.log(res);
-//    }
-//);
+

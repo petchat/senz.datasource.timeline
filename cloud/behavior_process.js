@@ -5,29 +5,7 @@
 var dao = require('cloud/dao.js');
 var method = require("cloud/method.js");
 var algo = require("cloud/algo.js");
-
-
-// TODO: From database, not this function.
-var convertSenz = function (behaivor) {
-    var new_behavior = [];
-    if (behaivor != undefined && behaivor.length >= 1) {
-        behaivor.forEach(function (senz) {
-            var new_senz = {
-                "motion": {},
-                "location": {},
-                "sound": {}
-            };
-            new_senz["motion"] = senz["motionProb"];
-            new_senz["location"] = senz["poiProbLv2"];
-            new_senz["sound"] = senz["soundProb"];
-            new_behavior.push(new_senz);
-        });
-    }
-    else {
-        console.log("Fuck!!!!");
-    }
-    return new_behavior;
-};
+var util = require("cloud/util.js");
 
 exports.behaviorProcess = function (behavior_len, step, scale, user_id) {
     return dao.getUserBehaviorLastUpdateTime(user_id).then(
@@ -39,9 +17,9 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id) {
                 method.behaviorGenerator(user_id, start_time, end_time, scale, true).then(
                     function (saved_result) {
                         var behavior = saved_result.get("behaviorData");
-                        console.log(behavior);
+                        //console.log(util.convertSenz(behavior));
                         // TODO: prob2muti need to fill the empty scale.
-                        return algo.prob2muti(convertSenz(behavior), "SELECT_MAX_N_PROB");
+                        return algo.prob2muti(util.convertSenz(behavior), "SELECT_MAX_N_PROB");
                     },
                     function (error){
                         return AV.Promise.error(error);
