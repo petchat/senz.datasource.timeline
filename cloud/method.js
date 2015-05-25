@@ -52,7 +52,7 @@ exports.senzGenerator = function (is_training) {
 
 
 exports.behaviorGenerator = function (user_id, start_time, end_time, scale, is_stored) {
-    console.log('Behavior Generating...\n============');
+    //console.log('Behavior Generating...\n============');
     var senz_id_list = [];
     //var promise = new AV.Promise();
     return dao.getUserRawBehavior(user_id, start_time, end_time).then(

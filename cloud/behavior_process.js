@@ -30,7 +30,7 @@ var convertSenz = function (behaivor) {
 };
 
 exports.behaviorProcess = function (behavior_len, step, scale, user_id) {
-    dao.getUserBehaviorLastUpdateTime(user_id).then(
+    return dao.getUserBehaviorLastUpdateTime(user_id).then(
         function (timestamp) {
             var start_time = timestamp.getTime();
             var end_time = start_time + behavior_len;
@@ -39,8 +39,12 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id) {
                 method.behaviorGenerator(user_id, start_time, end_time, scale, true).then(
                     function (saved_result) {
                         var behavior = saved_result.get("behaviorData");
+                        console.log(behavior);
                         // TODO: prob2muti need to fill the empty scale.
-                        return algo.prob2muti(convertSenz(behavior), "SELECT_MAX_PROB");
+                        return algo.prob2muti(convertSenz(behavior), "SELECT_MAX_N_PROB");
+                    },
+                    function (error){
+                        return AV.Promise.error(error);
                     }
                 ).then(
                     function (senz_list_result) {
@@ -48,16 +52,20 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id) {
                         senz_list_result.forEach(function (senz_object) {
                             var prob = senz_object["prob"];
                             var senz_list = senz_object["senzList"];
-                            //console.log(JSON.stringify(senz_list));
+                            console.log(JSON.stringify(senz_list));
                             promises.push(algo.predict("GMMHMM", "random_generated_base_model", senz_list));
                         });
                         return AV.Promise.all(promises);
+                    },
+                    function (error){
+                        return AV.Promise.error(error);
                     }
                 ).then(
                     function (predict_result){
-                        // TODO some predice result is error.
-                        console.log(JSON.stringify(senz_list));
                         console.log(predict_result);
+                    },
+                    function (error){
+                        return AV.Promise.error(error);
                     }
                 );
                 start_time += step;

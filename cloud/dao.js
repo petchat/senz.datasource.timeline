@@ -4,9 +4,10 @@
 var config = require('cloud/config.js');
 var util = require('cloud/util.js');
 
+var user_status = AV.Object.extend('UserStatus');
+var Behavior = AV.Object.extend('UserBehavior');
+var Senz = AV.Object.extend('UserSenz');
 
-// Basic Data Access Operation:
-//-----------------------------
 var _getUnbindData = function (UserRawdata, is_training) {
     var promise = new AV.Promise();
     var user_rawdata = AV.Object.extend(UserRawdata);
@@ -91,7 +92,7 @@ var _addSenz = function (user_id, location_obj_id, motion_obj_id, sound_obj_id, 
         + '\n* sound id: ' + sound_obj_id
     );
     var promise = new AV.Promise();
-    var Senz = AV.Object.extend('UserSenz');
+    //var Senz = AV.Object.extend('UserSenz');
     var senz = new Senz();
     if (motion_obj_id != config.counterfeitObjectId){
         var motion_pointer = AV.Object.createWithoutData('UserMotion', motion_obj_id);
@@ -160,7 +161,6 @@ exports.completeRawdataBinding = function (location_id_list, motion_id_list, sou
     return AV.Promise.all(promises);
 };
 
-// - For only one user.
 exports.addSenz = function (user, senz_list, is_training) {
     console.log('\nAdding new generated senzes to database...');
     console.log('------------------------------------------');
@@ -197,16 +197,12 @@ exports.addSenz = function (user, senz_list, is_training) {
     return AV.Promise.all(promises);
 };
 
-
-// User Behavior API:
-//-------------------
 exports.getUserRawBehavior = function (user_id, start_time, end_time, is_training) {
-    console.log('\nRetrieving User ' + user_id + ' Behavior...');
-    console.log('------------------------------------------');
+    //console.log('\nRetrieving User ' + user_id + ' Behavior...');
+    //console.log('------------------------------------------');
     var promise = new AV.Promise();
-    var user_senz = AV.Object.extend('UserSenz');
     var user = AV.Object.createWithoutData('_User', user_id);
-    var query = new AV.Query(user_senz);
+    var query = new AV.Query(Senz);
     query.equalTo('user', user);
     query.equalTo('isTrainingSample', is_training);
     query.greaterThan('timestamp', start_time);
@@ -217,7 +213,7 @@ exports.getUserRawBehavior = function (user_id, start_time, end_time, is_trainin
     query.include('userMotion');
     query.find().then(
         function (results) {
-            console.log('  Successfully retrieved ' + results.length + ' senzes in User Behavior during this period.');
+            //console.log('  Successfully retrieved ' + results.length + ' senzes in User Behavior during this period.');
             var behavior = [];
             results.forEach(function (result) {
                 var data = {
@@ -279,23 +275,15 @@ exports.getUserRawBehavior = function (user_id, start_time, end_time, is_trainin
     return promise;
 };
 
-
 exports.addBehavior = function (user_id, behavior_data, day_type, senz_id_list, start_time, end_time) {
-    //console.log('\nAdding new generated behavior to database...');
-    //console.log('------------------------------------------');
-    //var promise = new AV.Promise();
-
-    var Behavior = AV.Object.extend('UserBehavior');
     var behavior = new Behavior();
-
     var related_senzes = [];
     senz_id_list.forEach(function (senz_id) {
         related_senzes.push(AV.Object.createWithoutData("UserSenz", senz_id));
     });
     var user_pointer = AV.Object.createWithoutData('_User', user_id);
     var relation = behavior.relation("relatedSenzes");
-    var timestamp = new Date();
-
+    //var timestamp = new Date();
     if (behavior_data.length >= 1){
         behavior.set('behaviorData', behavior_data);
         behavior.set('user', user_pointer);
@@ -308,27 +296,20 @@ exports.addBehavior = function (user_id, behavior_data, day_type, senz_id_list, 
         return behavior.save();
     }
     else{
-        var promise = new AV.Promise();
-        promise.reject("the behavior is undefine");
-        return promise;
+        return AV.Promise.error("the behavior is undefine");
     }
 };
 
-
-// Get _user.lastUpdateTime
 exports.getUserBehaviorLastUpdateTime = function (user_id) {
     var promise = new AV.Promise();
-    var user_status = AV.Object.extend('UserStatus');
     var user = AV.Object.createWithoutData('_User', user_id);
     var query = new AV.Query(user_status);
     query.equalTo('user', user);
-    query.find().then(
-        function (results) {
-            var timestamp = undefined;
-            results.forEach(function (result){
-                timestamp = result.get("behaviorLastUpdatedAt");
-                console.log(timestamp);
-            });
+    query.ascending("timestamp");
+    query.first().then(
+        function (result) {
+            var timestamp = result.get("behaviorLastUpdatedAt");
+            console.log(timestamp);
             promise.resolve(timestamp);
         },
         function (error_info) {
@@ -338,50 +319,24 @@ exports.getUserBehaviorLastUpdateTime = function (user_id) {
     return promise;
 };
 
-
-exports.updateUserBehaviorLastUpdatedTime = function (user_id, timestamp) {
-    //var UserStatus = AV.Object.extend('UserStatus');
-    //var user_behavior = new UserStatus();
-    //
-    //var user_pointer = AV.Object.createWithoutData('_User', user_id)
-    var promise = new AV.Promise();
-    var user_status = AV.Object.extend('UserStatus');
+exports.updateUserBehaviorLastUpdatedTime = function (user_id, unix_timestamp) {
+    var new_timestamp = new Date(unix_timestamp);
     var user = AV.Object.createWithoutData('_User', user_id);
     var query = new AV.Query(user_status);
     query.equalTo('user', user);
-    query.limit(1);
     query.ascending("timestamp");
-    return query.find().then(
-        function (results) {
-            var object_id = undefined;
-            results.forEach(function (result){
-                object_id = result.id;
-            });
-            promise.resolve(object_id);
-        },
-        function (error_info) {
-            promise.reject(error_info);
+    return query.first().then(
+        function (result) {
+            return query.get(result.id);
         }
     ).then(
-        function (object_id) {
-            query.get(object_id, {
-                success: function(gameScore) {
-                    // 回调中可以取得这个 GameScore 对象的一个实例，然后就可以修改它了
-                    gameScore.set('behaviorLastUpdatedAt', timestamp);
-                    return gameScore.save();
-
-                    // The object was retrieved successfully.
-                },
-                error: function(object, error) {
-                    //console.log(object);
-                    // The object was not retrieved successfully.
-                    // error is a AV.Error with an error code and description.
-                }
-            });
+        function (user){
+            console.log("New time is:");
+            console.log(new_timestamp);
+            //user.set('behaviorLastUpdatedAt', new_timestamp);
+            return user.save();
         }
     );
-
-
 };
 
 

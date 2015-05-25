@@ -27,8 +27,8 @@ var refineSenz = function (data){
 exports.senzCollector = function (data){
     var user = data.user;
     delete data.user;
-    console.log('\nFor the user ' + user + '\nSend the http request to Senz Collector with the content of:\n' + JSON.stringify(data, null, 4));
-    console.log('------------------------------------------');
+    //console.log('\nFor the user ' + user + '\nSend the http request to Senz Collector with the content of:\n' + JSON.stringify(data, null, 4));
+    //console.log('------------------------------------------');
     var promise = new AV.Promise();
     req.post(
         {
@@ -104,7 +104,7 @@ exports.timeType = function (start_time, end_time){
 exports.prob2muti = function (prob_senz_list, strategy){
     var data = {
         "probSenzList": prob_senz_list,
-        "strategy": "SELECT_MAX_PROB"
+        "strategy": strategy
     };
     var promise = new AV.Promise();
     req.post(
@@ -141,10 +141,11 @@ exports.predict = function (algo_type, model_tag, seq){
             json: data
         },
         function (err, httpResponse, body) {
-            //console.log(body);
+            var res = body["result"];
             //console.log('Received result successfully.');
-            if (body["code"] == 0) {
+            if (res["code"] == 0) {
                 var result = body['result'];
+                //console.log(result);
                 promise.resolve(result);
             }
             else {
