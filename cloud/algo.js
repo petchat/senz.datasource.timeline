@@ -142,15 +142,22 @@ exports.predict = function (algo_type, model_tag, seq){
         },
         function (err, httpResponse, body) {
             var res = body["result"];
+            //console.log(res);
             //console.log('Received result successfully.');
+            //if (res["code"] == 0) {
+            //    console.log("haha");
+            //}
             if (res["code"] == 0) {
                 var result = body['result'];
                 //console.log(result);
                 promise.resolve(result);
             }
-            else {
+            else if (!!res["code"] && res["code"] != 0){
                 var error = body["message"];
                 promise.reject(error);
+            }
+            else{
+                promise.reject("The analyser is crashed.");
             }
         }
     );

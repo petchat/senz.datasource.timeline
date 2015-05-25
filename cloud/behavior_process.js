@@ -13,8 +13,9 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id) {
             var start_time = timestamp.getTime();
             var end_time = start_time + behavior_len;
             var cur_time = (new Date()).getTime();
+            var Promises = [];
             while (end_time < cur_time) {
-                method.behaviorGenerator(user_id, start_time, end_time, scale, true).then(
+                var bp = method.behaviorGenerator(user_id, start_time, end_time, scale, true).then(
                     function (saved_result) {
                         var behavior = saved_result.get("behaviorData");
                         //console.log(util.convertSenz(behavior));
@@ -41,15 +42,18 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id) {
                 ).then(
                     function (predict_result){
                         console.log(predict_result);
+                        return AV.Promise.as(predict_result);
                     },
                     function (error){
                         return AV.Promise.error(error);
                     }
                 );
+                Promises.push(bp);
                 start_time += step;
                 end_time += step;
             }
-            return dao.updateUserBehaviorLastUpdatedTime(user_id, start_time);
+            Promises.push(dao.updateUserBehaviorLastUpdatedTime(user_id, start_time));
+            return AV.Promise.when(Promises);
         }
     );
 };
