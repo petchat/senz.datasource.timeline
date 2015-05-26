@@ -7,10 +7,15 @@ var util = require('cloud/util.js');
 var user_status = AV.Object.extend('UserStatus');
 var Behavior = AV.Object.extend('UserBehavior');
 var Senz = AV.Object.extend('UserSenz');
+var AvRawdataExtendObj = {
+    "UserLocation": AV.Object.extend("UserLocation"),
+    "UserMotion": AV.Object.extend("UserMotion"),
+    "UserSound": AV.Object.extend("UserSound")
+};
 
 var _getUnbindData = function (UserRawdata, is_training) {
     var promise = new AV.Promise();
-    var user_rawdata = AV.Object.extend(UserRawdata);
+    var user_rawdata = AvRawdataExtendObj[UserRawdata];
     var query = new AV.Query(user_rawdata);
     query.ascending("timestamp");
     query.equalTo('processStatus', 'untreated');
@@ -333,7 +338,7 @@ exports.updateUserBehaviorLastUpdatedTime = function (user_id, unix_timestamp) {
         function (user){
             console.log("New time is:");
             console.log(new_timestamp);
-            //user.set('behaviorLastUpdatedAt', new_timestamp);
+            user.set('behaviorLastUpdatedAt', new_timestamp);
             return user.save();
         }
     );
