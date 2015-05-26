@@ -7,7 +7,7 @@ var method = require("cloud/method.js");
 var algo = require("cloud/algo.js");
 var util = require("cloud/util.js");
 
-exports.behaviorProcess = function (behavior_len, step, scale, user_id) {
+exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_type, tag) {
     return dao.getUserBehaviorLastUpdateTime(user_id).then(
         function (timestamp) {
             var start_time = timestamp.getTime();
@@ -32,7 +32,7 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id) {
                             var prob = senz_object["prob"];
                             var senz_list = senz_object["senzList"];
                             console.log(JSON.stringify(senz_list));
-                            promises.push(algo.predict("GMMHMM", "random_generated_base_model", senz_list));
+                            promises.push(algo.predict(algo_type, tag, senz_list));
                         });
                         return AV.Promise.all(promises);
                     },
