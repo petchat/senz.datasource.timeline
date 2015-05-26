@@ -87,6 +87,7 @@ exports.behaviorGenerator = function (user_id, start_time, end_time, scale, is_s
                 senz_id_list.push(senz['senzId']);
             });
             //console.log(behavior.length);
+            //console.log(behavior);
             return algo.behaviorCollector(behavior, scale);
         }
     ).then(

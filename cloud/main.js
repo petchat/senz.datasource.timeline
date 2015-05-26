@@ -92,7 +92,7 @@ AV.Cloud.define("event", function (request, response) {
 AV.Cloud.define("eventTimer", function (request, response) {
 
     console.log("i'm here,eventTimer");
-    var behavior_len = 3600*1000, //
+    var behavior_len = 30*60*1000, //
         step = 5*60*1000, //
         scale = "tenMinScale",
         user_id = "555e92e6e4b06e8bb85473ce",
