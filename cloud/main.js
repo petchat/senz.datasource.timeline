@@ -22,6 +22,24 @@ AV.Cloud.define("senz", function (request, response) {
         });
 });
 
+AV.Cloud.define("senzTimer", function (request, response) {
+    
+    var is_training = 1;
+    method.senzGenerator(is_training).then(
+        function (bindedSenzes) {
+            //response.success("rawsenz generated," + bindedSenzes.length);
+            response.success({
+                code: 0,
+                result: bindedSenzes,
+                message: "rawsenz generated."
+            })
+        },
+        function (err) {
+            response.error(err);
+        });
+});
+
+
 AV.Cloud.define("behavior", function (request, response) {
     var user = request.params.userId,
         start_time = request.params.startTime,
@@ -49,6 +67,30 @@ AV.Cloud.define("event", function (request, response) {
         step = request.params.step,
         scale = request.params.scale,
         user_id = request.params.userId;
+
+    bp.behaviorProcess(behavior_len, step, scale, user_id).then(
+        function (event_results){
+            response.success({
+                code: 0,
+                result: event_results,
+                message: "All events are generated correctly."
+            });
+        },
+        function (error){
+            response.success({
+                code: 0,
+                errorEventList: error,
+                message: "Part of events are generated but user data is not integrated."
+            });
+        }
+    );
+});
+
+AV.Cloud.define("eventTimer", function (request, response) {
+    var behavior_len = 3600*1000, //
+        step = 5*60*1000, //
+        scale = "tenMinScale",
+        user_id = "555e92e6e4b06e8bb85473ce";
 
     bp.behaviorProcess(behavior_len, step, scale, user_id).then(
         function (event_results){
