@@ -68,5 +68,5 @@ AV.Cloud.define("event", function (request, response) {
     );
 });
 
-bp.behaviorProcess(600000000, 100000000, "tenMinScale", "553e0e83e4b06b192e99bf3a");
+//bp.behaviorProcess(600000000, 100000000, "tenMinScale", "553e0e83e4b06b192e99bf3a");
 
