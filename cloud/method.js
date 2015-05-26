@@ -13,6 +13,11 @@ exports.senzGenerator = function (is_training) {
         // Request the senz collector with untreated data
         // to get the list of senz tuples.
         function (user_location_list, user_motion_list, user_sound_list) {
+            if (user_location_list.length < 1 &&
+                user_motion_list.length < 1 &&
+                user_sound_list.length < 1){
+                return AV.Promise.error("There is no new raw data.");
+            }
             var users_list = util.uniqueUsersSet(config.user_list);
             var promises = [];
             console.log(users_list);
@@ -34,11 +39,17 @@ exports.senzGenerator = function (is_training) {
     ).then(
         // Save the list of senz tuples to LeanCloud.
         function (senz_list) {
+            if (senz_list == undefined || senz_list.length < 1){
+                return AV.Promise.error("After log2rawsenz middleware, There is no senz left.");
+            }
             var promises = [];
             senz_list.forEach(function (user_result) {
                 promises.push(dao.addSenz(user_result.user, user_result.result, is_training));
             });
             return AV.Promise.all(promises);
+        },
+        function (error){
+            return AV.Promise.error(error);
         }
     ).then(
         // Label the rawdata in LeanCloud.
@@ -47,6 +58,9 @@ exports.senzGenerator = function (is_training) {
             var motion_id_list = util.bindRawdataIdFromSenzList('motion_id', senz_id_list);
             var location_id_list = util.bindRawdataIdFromSenzList('location_id', senz_id_list);
             return dao.completeRawdataBinding(location_id_list, motion_id_list, sound_id_list);
+        },
+        function (error){
+            return AV.Promise.error(error);
         }
     );
 };
@@ -79,9 +93,10 @@ exports.behaviorGenerator = function (user_id, start_time, end_time, scale, is_s
                 return AV.Promise.as(behavior_refined);
             }
             else{
-                var promise = new AV.Promise();
-                promise.reject("the behavior's count is 0");
-                return promise;
+                //var promise = new AV.Promise();
+                //promise.reject("the behavior's count is 0");
+                //return promise;
+                return AV.Promise.error("the behavior's count is 0");
             }
             //dao.addBehavior(user_id, behavior_refined, 'normal', senz_id_list);
         }
