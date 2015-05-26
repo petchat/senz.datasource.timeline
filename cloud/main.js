@@ -28,14 +28,15 @@ AV.Cloud.define("senzTimer", function (request, response) {
     method.senzGenerator(is_training).then(
         function (bindedSenzes) {
             //response.success("rawsenz generated," + bindedSenzes.length);
-            response.success({
-                code: 0,
-                result: bindedSenzes,
-                message: "rawsenz generated."
-            })
+            // response.success({
+            //     code: 0,
+            //     result: bindedSenzes,
+            //     message: "rawsenz generated."
+            // })
+            console.log("fuck i'm done");
         },
         function (err) {
-            response.error(err);
+            console.log("i've had enough of you!")
         });
 });
 
