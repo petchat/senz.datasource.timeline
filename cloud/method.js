@@ -32,9 +32,9 @@ exports.senzGenerator = function (is_training) {
                     },
                     "primary_key": config.collector_primary_key
                 };
-                if (user_location_list.length < 1 &&
-                    user_motion_list.length < 1 &&
-                    user_sound_list.length < 1){
+                if (user_location_list[user].length < 1 &&
+                    user_motion_list[user].length < 1 &&
+                    user_sound_list[user].length < 1){
                     promises.push(AV.Promise.error("There is no new raw data."));
                 }
                 else {
