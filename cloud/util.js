@@ -16,7 +16,7 @@ exports.bindRawdataIdFromSenzList = function (rawdata_type, senz_list){
 
 exports.uniqueUsersSet = function (users_sets){
     var universal_set = new Set();
-    for (users_set in users_sets) {
+    for (var users_set in users_sets) {
         users_sets[users_set].forEach(function (user) {
             universal_set.add(user);
         });
