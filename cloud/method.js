@@ -13,40 +13,43 @@ exports.senzGenerator = function (is_training) {
         // Request the senz collector with untreated data
         // to get the list of senz tuples.
         function (user_location_list, user_motion_list, user_sound_list) {
-            //if (user_location_list.length < 1 &&
-            //    user_motion_list.length < 1 &&
-            //    user_sound_list.length < 1){
-            //    return AV.Promise.error("There is no new raw data.");
-            //}
+            //console.log(user_location_list);
+            //console.log(user_motion_list);
+            //console.log(user_sound_list);
             var users_list = util.uniqueUsersSet(config.user_list);
             var promises = [];
-            console.log(users_list);
+            //console.log(users_list);
             users_list.forEach(function (user) {
+                var location_list = user_location_list[user],
+                    motion_list = user_motion_list[user],
+                    sound_list = user_sound_list[user];
+                if (location_list == undefined) {
+                    location_list = []
+                }
+                if (motion_list == undefined) {
+                    motion_list = []
+                }
+                if (sound_list == undefined) {
+                    sound_list = []
+                }
                 var request_data = {
                     "user": user,
                     "filter": 1000 * 120,
                     "timelines": {
-                        "location": user_location_list[user],
-                        "motion": user_motion_list[user],
-                        "sound": user_sound_list[user]
+                        "location": location_list,
+                        "motion": motion_list,
+                        "sound": sound_list
                     },
                     "primary_key": config.collector_primary_key
                 };
-                if (user_location_list[user].length < 1 &&
-                    user_motion_list[user].length < 1 &&
-                    user_sound_list[user].length < 1){
-                    promises.push(AV.Promise.error("There is no new raw data."));
-                }
-                else {
-                    promises.push(algo.senzCollector(request_data));
-                }
+                promises.push(algo.senzCollector(request_data));
             });
             return AV.Promise.all(promises);
         }
     ).then(
         // Save the list of senz tuples to LeanCloud.
         function (senz_list) {
-            if (senz_list == undefined || senz_list.length < 1){
+            if (senz_list == undefined || senz_list.length < 1) {
                 return AV.Promise.error("After log2rawsenz middleware, There is no senz left.");
             }
             var promises = [];
@@ -55,7 +58,7 @@ exports.senzGenerator = function (is_training) {
             });
             return AV.Promise.all(promises);
         },
-        function (error){
+        function (error) {
             return AV.Promise.error(error);
         }
     ).then(
@@ -66,7 +69,7 @@ exports.senzGenerator = function (is_training) {
             var location_id_list = util.bindRawdataIdFromSenzList('location_id', senz_id_list);
             return dao.completeRawdataBinding(location_id_list, motion_id_list, sound_id_list);
         },
-        function (error){
+        function (error) {
             return AV.Promise.error(error);
         }
     );
@@ -95,11 +98,11 @@ exports.behaviorGenerator = function (user_id, start_time, end_time, scale, is_s
                 //console.log('The result will be stored in LeanCloud.');
                 return dao.addBehavior(user_id, behavior_refined, 'normal', senz_id_list, start_time, end_time);
             }
-            else if (is_stored == false && behavior_refined != undefined && behavior_refined.length >= 1){
+            else if (is_stored == false && behavior_refined != undefined && behavior_refined.length >= 1) {
                 console.log('The result will be return.');
                 return AV.Promise.as(behavior_refined);
             }
-            else{
+            else {
                 //var promise = new AV.Promise();
                 //promise.reject("the behavior's count is 0");
                 //return promise;
