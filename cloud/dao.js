@@ -61,7 +61,7 @@ var _completeRawdataBinding = function (UserRawdata, rawdata_id) {
             success: function (userRawdata) {
                 var date = new Date();
                 // *** HERE NEED TO REVISE THE PROCESS STATUS TO SENZED ***
-                userRawdata.set('processStatus', 'untreated');
+                userRawdata.set('processStatus', 'senzed');
                 userRawdata.set('senzedAt', date);
                 userRawdata.save().then(
                     function (obj) {
