@@ -15,6 +15,7 @@ exports.senzGenerator = function (is_training) {
         function (user_location_list, user_motion_list, user_sound_list) {
             var users_list = util.uniqueUsersSet(config.user_list);
             var promises = [];
+            console.log(users_list);
             users_list.forEach(function (user) {
                 var request_data = {
                     "user": user,

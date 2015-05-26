@@ -2,6 +2,7 @@
  * Created by woodie on 4/26/15.
  */
 var _ = require("underscore");
+var Set = require("simplesets").Set;
 
 exports.bindRawdataIdFromSenzList = function (rawdata_type, senz_list){
     var rawdata_id_list = new Set();
@@ -10,7 +11,7 @@ exports.bindRawdataIdFromSenzList = function (rawdata_type, senz_list){
             rawdata_id_list.add(senz[rawdata_type]);
         });
     });
-    return rawdata_id_list;
+    return rawdata_id_list._items;
 };
 
 
@@ -21,7 +22,7 @@ exports.uniqueUsersSet = function (users_sets){
             universal_set.add(user);
         });
     }
-    return universal_set;
+    return universal_set._items;
 };
 
 // time_zone_type:
