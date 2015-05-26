@@ -23,7 +23,7 @@ AV.Cloud.define("senz", function (request, response) {
 });
 
 AV.Cloud.define("senzTimer", function (request, response) {
-    
+
     var is_training = 1;
     console.log("i'm here");
     method.senzGenerator(is_training).then(
@@ -40,7 +40,6 @@ AV.Cloud.define("senzTimer", function (request, response) {
             response.error(err);
         });
 });
-
 
 AV.Cloud.define("behavior", function (request, response) {
     var user = request.params.userId,
@@ -89,7 +88,7 @@ AV.Cloud.define("event", function (request, response) {
 });
 
 AV.Cloud.define("eventTimer", function (request, response) {
-    
+
     console.log("i'm here,eventTimer");
     var behavior_len = 3600*1000, //
         step = 5*60*1000, //
@@ -116,11 +115,6 @@ AV.Cloud.define("eventTimer", function (request, response) {
 
         }
     );
-});
-
-AV.Cloud.define("malegebazi", function (request, response) {
-    console.log("malegebazi!!!");
-    response.success("malegebazi!!!");
 });
 
 //bp.behaviorProcess(600000000, 100000000, "tenMinScale", "553e0e83e4b06b192e99bf3a");
