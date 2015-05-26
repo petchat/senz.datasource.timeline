@@ -118,5 +118,9 @@ AV.Cloud.define("eventTimer", function (request, response) {
     );
 });
 
+AV.Cloud.define("malegebazi", function (request, response) {
+    console.log("malegebazi!!!");
+});
+
 //bp.behaviorProcess(600000000, 100000000, "tenMinScale", "553e0e83e4b06b192e99bf3a");
 
