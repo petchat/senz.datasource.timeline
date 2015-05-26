@@ -13,11 +13,11 @@ exports.senzGenerator = function (is_training) {
         // Request the senz collector with untreated data
         // to get the list of senz tuples.
         function (user_location_list, user_motion_list, user_sound_list) {
-            if (user_location_list.length < 1 &&
-                user_motion_list.length < 1 &&
-                user_sound_list.length < 1){
-                return AV.Promise.error("There is no new raw data.");
-            }
+            //if (user_location_list.length < 1 &&
+            //    user_motion_list.length < 1 &&
+            //    user_sound_list.length < 1){
+            //    return AV.Promise.error("There is no new raw data.");
+            //}
             var users_list = util.uniqueUsersSet(config.user_list);
             var promises = [];
             console.log(users_list);
@@ -32,7 +32,14 @@ exports.senzGenerator = function (is_training) {
                     },
                     "primary_key": config.collector_primary_key
                 };
-                promises.push(algo.senzCollector(request_data));
+                if (user_location_list.length < 1 &&
+                    user_motion_list.length < 1 &&
+                    user_sound_list.length < 1){
+                    promises.push(AV.Promise.error("There is no new raw data."));
+                }
+                else {
+                    promises.push(algo.senzCollector(request_data));
+                }
             });
             return AV.Promise.all(promises);
         }
