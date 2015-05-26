@@ -28,16 +28,16 @@ AV.Cloud.define("senzTimer", function (request, response) {
     console.log("i'm here");
     method.senzGenerator(is_training).then(
         function (bindedSenzes) {
-            //response.success("rawsenz generated," + bindedSenzes.length);
-            // response.success({
-            //     code: 0,
-            //     result: bindedSenzes,
-            //     message: "rawsenz generated."
-            // })
             console.log("fuck i'm done");
+            response.success({
+                 code: 0,
+                 result: bindedSenzes,
+                 message: "rawsenz generated."
+            });
         },
         function (err) {
-            console.log("i've had enough of you!")
+            console.log("i've had enough of you!");
+            response.error(err);
         });
 });
 
@@ -98,18 +98,22 @@ AV.Cloud.define("eventTimer", function (request, response) {
 
     bp.behaviorProcess(behavior_len, step, scale, user_id).then(
         function (event_results){
+            console.log("All new events are generated.");
             response.success({
                 code: 0,
                 result: event_results,
                 message: "All events are generated correctly."
             });
+
         },
         function (error){
+            console.log("There are some event are vacant, but still go on.");
             response.success({
                 code: 0,
                 errorEventList: error,
                 message: "Part of events are generated but user data is not integrated."
             });
+
         }
     );
 });
