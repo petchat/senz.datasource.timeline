@@ -13,12 +13,9 @@ exports.senzGenerator = function (is_training) {
         // Request the senz collector with untreated data
         // to get the list of senz tuples.
         function (user_location_list, user_motion_list, user_sound_list) {
-            //console.log(user_location_list);
-            //console.log(user_motion_list);
-            //console.log(user_sound_list);
+            // TODO: user set need to promoted.
             var users_list = util.uniqueUsersSet(config.user_list);
             var promises = [];
-            //console.log(users_list);
             users_list.forEach(function (user) {
                 var location_list = user_location_list[user],
                     motion_list = user_motion_list[user],
@@ -32,17 +29,20 @@ exports.senzGenerator = function (is_training) {
                 if (sound_list == undefined) {
                     sound_list = []
                 }
-                var request_data = {
-                    "user": user,
-                    "filter": 1000 * 120,
-                    "timelines": {
-                        "location": location_list,
-                        "motion": motion_list,
-                        "sound": sound_list
-                    },
-                    "primary_key": config.collector_primary_key
-                };
-                promises.push(algo.senzCollector(request_data));
+                // TODO: need to promoted here.
+                if (location_list.length >= 1) {
+                    var request_data = {
+                        "user": user,
+                        "filter": 1000 * 120,
+                        "timelines": {
+                            "location": location_list,
+                            "motion": motion_list,
+                            "sound": sound_list
+                        },
+                        "primary_key": config.collector_primary_key
+                    };
+                    promises.push(algo.senzCollector(request_data));
+                }
             });
             return AV.Promise.all(promises);
         }
