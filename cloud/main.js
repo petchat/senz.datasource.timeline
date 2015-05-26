@@ -25,6 +25,7 @@ AV.Cloud.define("senz", function (request, response) {
 AV.Cloud.define("senzTimer", function (request, response) {
     
     var is_training = 1;
+    console.log("i'm here");
     method.senzGenerator(is_training).then(
         function (bindedSenzes) {
             //response.success("rawsenz generated," + bindedSenzes.length);
@@ -88,6 +89,8 @@ AV.Cloud.define("event", function (request, response) {
 });
 
 AV.Cloud.define("eventTimer", function (request, response) {
+    
+    console.log("i'm here,eventTimer");
     var behavior_len = 3600*1000, //
         step = 5*60*1000, //
         scale = "tenMinScale",
