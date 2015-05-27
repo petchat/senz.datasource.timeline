@@ -71,7 +71,7 @@ exports.senzGenerator = function (is_training) {
     ).then(
         // Label the rawdata in LeanCloud.
         function (senz_id_list) {
-            logger.info(config.logEventType.sav, "user<" + user_result.user + ">'s senz is saved");
+            logger.info(config.logEventType.sav, "all users' senz is saved");
             var sound_id_list = util.bindRawdataIdFromSenzList("sound_id", senz_id_list);
             var motion_id_list = util.bindRawdataIdFromSenzList("motion_id", senz_id_list);
             var location_id_list = util.bindRawdataIdFromSenzList("location_id", senz_id_list);

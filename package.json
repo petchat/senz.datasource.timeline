@@ -6,6 +6,7 @@
     "dependencies": {
         "request": "latest",
         "underscore": "latest",
-        "simplesets": "latest"
+        "simplesets": "latest",
+        "node-logentries": "latest"
     }
 }
