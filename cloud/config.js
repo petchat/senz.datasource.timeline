@@ -36,3 +36,16 @@ exports.url = {
         }
     }
 };
+
+exports.logentries_token = "17f926e1-b004-4c56-a606-8dd2b9aeab23";
+
+exports.logEventType = {
+    "sta": "Start",
+    "ret": "Retrieving",
+    "sav": "Saving",
+    "upd": "Updating",
+    "r2s": "Middleware.Log.RawSenz",
+    "r2r": "Middleware.RawSenz.RefinedSenz",
+    "p2m": "Middleware.ProbSenz.MultiSenz",
+    "anl": "Analyser.User.Event"
+};
