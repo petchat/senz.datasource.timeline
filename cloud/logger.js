@@ -17,9 +17,9 @@ exports.debug = function (event, msg){
 };
 
 exports.warn = function (event, msg){
-    log.warn("[" + event + "]" + " " + msg);
+    log.warning("[" + event + "]" + " " + msg);
 };
 
 exports.error = function (event, msg){
-    log.error("[" + event + "]" + " " + msg);
+    log.err("[" + event + "]" + " " + msg);
 };

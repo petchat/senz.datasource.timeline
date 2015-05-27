@@ -24,7 +24,7 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_typ
                 var start_t = new Date(start_time);
                 var end_t = new Date(end_time);
                 var behavior_id = undefined;
-                var senz_list = [];
+                var _senz_list_result = [];
                 var bp = method.behaviorGenerator(user_id, start_time, end_time, scale, true).then(
                     function (saved_result) {
                         logger.info(config.logEventType.sav, "user<" + user_id + ">'s behavior from " + start_t + " to " + end_t + "is saved");
@@ -43,9 +43,10 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_typ
                     function (senz_list_result) {
                         logger.info(config.logEventType.p2m, "receive user<" + user_id + ">'s several observation without probability from " + start_t + " to " + end_t);
                         var promises = [];
+                        _senz_list_result = senz_list_result;
                         senz_list_result.forEach(function (senz_object) {
                             var prob = senz_object["prob"];
-                            senz_list = senz_object["senzList"];
+                            var senz_list = senz_object["senzList"];
                             console.log(JSON.stringify(senz_list));
                             logger.info(config.logEventType.anl, "request with user<" + user_id + ">'s a observation from " + start_t + " to " + end_t);
                             promises.push(algo.predict(algo_type, tag, senz_list));
@@ -59,11 +60,11 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_typ
                 ).then(
                     function (predict_result){
                         logger.info(config.logEventType.anl, "receive user<" + user_id + ">'s prediction");
-                        //console.log(predict_result);
+                        console.log(predict_result);
                         var predictions = [];
-                        for (var i=0; i<senz_list.length; i++){
+                        for (var i=0; i<_senz_list_result.length; i++){
                             var prediction_obj = {
-                                "behavior": senz_list[i],
+                                "behavior": _senz_list_result[i],
                                 "prediction": predict_result[i]["scores"],
                                 "algoType": algo_type,
                                 "modelTag": tag
