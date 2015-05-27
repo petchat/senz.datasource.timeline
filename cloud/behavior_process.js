@@ -19,31 +19,34 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_typ
             var end_time = start_time + behavior_len;
             var cur_time = (new Date()).getTime();
             var Promises = [];
+            //var _behavior_ids = {};
+            //var _senz_list_results = {};
 
             while (end_time < cur_time) {
                 var start_t = new Date(start_time);
                 var end_t = new Date(end_time);
-                var behavior_id = undefined;
-                var _senz_list_result = [];
+
                 var bp = method.behaviorGenerator(user_id, start_time, end_time, scale, true).then(
                     function (saved_result) {
                         logger.info(config.logEventType.sav, "user<" + user_id + ">'s behavior from " + start_t + " to " + end_t + "is saved");
                         var behavior = saved_result.get("behaviorData");
-                        behavior_id = saved_result.id;
-                        //console.log(util.convertSenz(behavior));
+                        var behavior_id = saved_result.id;
                         // TODO: prob2muti need to fill the empty scale.
                         logger.info(config.logEventType.p2m, "request with user<" + user_id + ">'s behavior  from " + start_t + " to " + end_t + " (probability obj)");
-                        return algo.prob2muti(util.convertSenz(behavior), "SELECT_MAX_N_PROB");
+                        return algo.prob2muti(util.convertSenz(behavior), "SELECT_MAX_N_PROB").then(
+                            function (senz_list_result){ return AV.Promise.as(senz_list_result, behavior_id); },
+                            function (error){ return AV.Promise.error(error); }
+                        )
                     },
                     function (error){
                         logger.error(config.logEventType.sav, "user<" + user_id + ">'s behavior is unsaved from " + start_t + " to " + end_t + " ,error msg:" + error);
                         return AV.Promise.error(error);
                     }
                 ).then(
-                    function (senz_list_result) {
+                    function (senz_list_result, behavior_id) {
                         logger.info(config.logEventType.p2m, "receive user<" + user_id + ">'s several observation without probability from " + start_t + " to " + end_t);
                         var promises = [];
-                        _senz_list_result = senz_list_result;
+                        //_senz_list_results[start_time.toString()] = senz_list_result;
                         senz_list_result.forEach(function (senz_object) {
                             var prob = senz_object["prob"];
                             var senz_list = senz_object["senzList"];
@@ -51,20 +54,23 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_typ
                             logger.info(config.logEventType.anl, "request with user<" + user_id + ">'s a observation from " + start_t + " to " + end_t);
                             promises.push(algo.predict(algo_type, tag, senz_list));
                         });
-                        return AV.Promise.all(promises);
+                        return AV.Promise.all(promises).then(
+                            function (predict_result){ return AV.Promise.as(predict_result, senz_list_result, behavior_id); },
+                            function (error){ return AV.Promise.error(error); }
+                        );
                     },
                     function (error){
                         logger.error(config.logEventType.p2m, "receive user<" + user_id + ">'s several observation without probability failed from " + start_t + " to " + end_t + " ,error msg:" + error);
                         return AV.Promise.error(error);
                     }
                 ).then(
-                    function (predict_result){
+                    function (predict_result, senz_list_result, behavior_id){
                         logger.info(config.logEventType.anl, "receive user<" + user_id + ">'s prediction");
                         console.log(predict_result);
                         var predictions = [];
-                        for (var i=0; i<_senz_list_result.length; i++){
+                        for (var i=0; i<senz_list_result.length; i++){
                             var prediction_obj = {
-                                "behavior": _senz_list_result[i],
+                                "behavior": senz_list_result[i],
                                 "prediction": predict_result[i]["scores"],
                                 "algoType": algo_type,
                                 "modelTag": tag
@@ -72,8 +78,8 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_typ
                             predictions.push(prediction_obj);
                         }
                         logger.info(config.logEventType.upd, "update user behavior's prediction");
-                        return dao.updateUserBehaviorPediction(behavior_id, predictions);
-                        //return AV.Promise.as(predict_result);
+                        console.log(behavior_id);
+                        return dao.updateUserBehaviorPrediction(behavior_id, predictions);
                     },
                     function (error){
                         logger.error(config.logEventType.anl, "predict user<" + user_id + "> failed, error msg:" + error);

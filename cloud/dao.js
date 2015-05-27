@@ -344,7 +344,7 @@ exports.updateUserBehaviorLastUpdatedTime = function (user_id, unix_timestamp) {
     );
 };
 
-exports.updateUserBehaviorPediction = function (behavior_id, prediction){
+exports.updateUserBehaviorPrediction = function (behavior_id, prediction){
     var query = new AV.Query(Behavior);
     return query.get(behavior_id).then(
         function (behavior){
