@@ -10,8 +10,11 @@ var config = require("cloud/config.js");
 var logger = require("cloud/logger.js");
 
 exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_type, tag) {
+    logger.info(config.logEventType.sta, "processing behavior");
+    logger.info(config.logEventType.ret, "user<" + user_id + ">'s behavior last updated time");
     return dao.getUserBehaviorLastUpdateTime(user_id).then(
         function (timestamp) {
+            logger.info(config.logEventType.ret, "user<" + user_id + ">'s behavior last updated time is got");
             var start_time = timestamp.getTime();
             var end_time = start_time + behavior_len;
             var cur_time = (new Date()).getTime();
@@ -30,6 +33,7 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_typ
                         return algo.prob2muti(util.convertSenz(behavior), "SELECT_MAX_N_PROB");
                     },
                     function (error){
+                        logger.error(config.logEventType.sav, "user<" + user_id + ">'s behavior is unsaved from " + start_t + " to " + end_t + " ,error msg:" + error);
                         return AV.Promise.error(error);
                     }
                 ).then(
@@ -46,6 +50,7 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_typ
                         return AV.Promise.all(promises);
                     },
                     function (error){
+                        logger.error(config.logEventType.p2m, "receive user<" + user_id + ">'s several observation without probability failed from " + start_t + " to " + end_t + " ,error msg:" + error);
                         return AV.Promise.error(error);
                     }
                 ).then(
@@ -55,6 +60,7 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_typ
                         return AV.Promise.as(predict_result);
                     },
                     function (error){
+                        logger.error(config.logEventType.anl, "predict user<" + user_id + "> failed, error msg:" + error);
                         return AV.Promise.error(error);
                     }
                 );
