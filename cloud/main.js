@@ -30,9 +30,9 @@ AV.Cloud.define("senzTimer", function (request, response) {
         function (bindedSenzes) {
             console.log("fuck i'm done");
             response.success({
-                 code: 0,
-                 result: bindedSenzes,
-                 message: "rawsenz generated."
+                code: 0,
+                result: bindedSenzes,
+                message: "rawsenz generated."
             });
         },
         function (err) {
@@ -57,7 +57,7 @@ AV.Cloud.define("behavior", function (request, response) {
                 message: "behavior generated."
             });
         },
-        function (err){
+        function (err) {
             response.error(err);
         }
     );
@@ -72,14 +72,14 @@ AV.Cloud.define("event", function (request, response) {
         tag = request.params.tag;
 
     bp.behaviorProcess(behavior_len, step, scale, user_id, algo_type, tag).then(
-        function (event_results){
+        function (event_results) {
             response.success({
                 code: 0,
                 result: event_results,
                 message: "All events are generated correctly."
             });
         },
-        function (error){
+        function (error) {
             response.success({
                 code: 0,
                 errorEventList: error,
@@ -92,15 +92,15 @@ AV.Cloud.define("event", function (request, response) {
 AV.Cloud.define("eventTimer", function (request, response) {
 
     console.log("i'm here,eventTimer");
-    var behavior_len = 30*60*1000, //
-        step = 5*60*1000, //
+    var behavior_len = 30 * 60 * 1000, //
+        step = 5 * 60 * 1000, //
         scale = "tenMinScale",
         user_id = "555e92e6e4b06e8bb85473ce",
         algo_type = "GMMHMM",
         tag = "for_testing";
 
     bp.behaviorProcess(behavior_len, step, scale, user_id, algo_type, tag).then(
-        function (event_results){
+        function (event_results) {
             console.log("All new events are generated.");
             response.success({
                 code: 0,
@@ -109,7 +109,7 @@ AV.Cloud.define("eventTimer", function (request, response) {
             });
 
         },
-        function (error){
+        function (error) {
             console.log("There are some event are vacant, but still go on.");
             response.success({
                 code: 0,
@@ -122,4 +122,3 @@ AV.Cloud.define("eventTimer", function (request, response) {
 });
 
 //bp.behaviorProcess(600000000, 100000000, "tenMinScale", "553e0e83e4b06b192e99bf3a");
-
