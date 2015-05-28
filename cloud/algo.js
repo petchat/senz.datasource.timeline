@@ -48,8 +48,8 @@ exports.senzCollector = function (data){
 // Input is a user's behavior(a list of senz) which every scale is redundant.
 // And it will return a new behavior(a list of senz less than the former) which every scale is not more than 1.
 exports.behaviorCollector = function (behavior, scale){
-    var promises     = new Array();
-    //var senz_id_list = new Array();
+    var promises     = [];
+    //var senz_id_list = [];
     var scale_bucket;
     // Initiation of Scale Bucket.
     if (scale == 'tenMinScale'){
@@ -63,7 +63,7 @@ exports.behaviorCollector = function (behavior, scale){
     }
     // Initiation of the senz list in any bucket.
     for (var i=0; i<scale_bucket.length; i++){
-        scale_bucket[i] = new Array();
+        scale_bucket[i] = [];
     }
     // Push the corresponding senz to the scale_bucket.
     behavior.forEach (function (senz){

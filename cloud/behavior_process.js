@@ -54,7 +54,7 @@ var logger = require("cloud/logger.js");
 exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_type, tag) {
     logger.info(config.logEventType.sta, "processing behavior");
     logger.info(config.logEventType.ret, "user<" + user_id + ">'s behavior last updated time");
-    return dao.getUserBehaviorLastUpdateTime(user_id).then(
+    return dao.getUserBehaviorLastUpdateTime(user_id, behavior_len).then(
         function (timestamp) {
             logger.info(config.logEventType.ret, "user<" + user_id + ">'s behavior last updated time is got");
             var start_time = timestamp.getTime();
@@ -66,7 +66,7 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_typ
                     startTime: start_time,
                     endTime: end_time
                 };
-                console.log(during);
+                //console.log(during);
                 Work.addTask(during);
                 start_time += step;
                 end_time += step;

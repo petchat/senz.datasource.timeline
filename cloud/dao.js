@@ -4,7 +4,7 @@
 var config = require('cloud/config.js');
 var util = require('cloud/util.js');
 
-var user_status = AV.Object.extend('UserStatus');
+var UserStatus = AV.Object.extend('UserStatus');
 var Behavior = AV.Object.extend('UserBehavior');
 var Senz = AV.Object.extend('UserSenz');
 var AvRawdataExtendObj = {
@@ -308,7 +308,7 @@ exports.addBehavior = function (user_id, behavior_data, day_type, senz_id_list, 
 exports.getUserBehaviorLastUpdateTime = function (user_id) {
     var promise = new AV.Promise();
     var user = AV.Object.createWithoutData('_User', user_id);
-    var query = new AV.Query(user_status);
+    var query = new AV.Query(UserStatus);
     query.equalTo('user', user);
     query.ascending("timestamp");
     query.first().then(
@@ -327,7 +327,7 @@ exports.getUserBehaviorLastUpdateTime = function (user_id) {
 exports.updateUserBehaviorLastUpdatedTime = function (user_id, unix_timestamp) {
     var new_timestamp = new Date(unix_timestamp);
     var user = AV.Object.createWithoutData('_User', user_id);
-    var query = new AV.Query(user_status);
+    var query = new AV.Query(UserStatus);
     query.equalTo('user', user);
     query.ascending("timestamp");
     return query.first().then(
@@ -357,6 +357,36 @@ exports.updateUserBehaviorPrediction = function (behavior_id, prediction){
     );
 };
 
-
-
-
+var _searchLatestSenz = function (user_id, last_update_time, behavior_len){
+    var promise = new AV.Promise();
+    var user = AV.Object.createWithoutData('_User', user_id);
+    var query = new AV.Query(Senz);
+    query.equalTo('user', user);
+    query.greaterThan("timestamp", last_update_time);
+    query.ascending("timestamp");
+    query.first().then(
+        function (result){
+            if (result == undefined){
+                var date = new Date();
+                console.log("the user has no senz recently.");
+                promise.resolve(date);
+            }
+            else {
+                var latest_timestamp = result.get("timestamp");
+                if (latest_timestamp < (last_update_time + behavior_len)) {
+                    console.log("the user has a while leaving.");
+                    promise.resolve(new Date(last_update_time));
+                }
+                else {
+                    promise.resolve(new Date(latest_timestamp));
+                }
+            }
+        },
+        function (error){
+            var date = new Date();
+            console.log("the user has no senz recently.");
+            promise.resolve(date);
+        }
+    );
+    return promise;
+};
