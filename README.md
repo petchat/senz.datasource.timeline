@@ -24,7 +24,9 @@ isTraining:
     + Header
 
             X-AVOSCloud-Application-Id  : pin72fr1iaxb7sus6newp250a4pl2n5i36032ubrck4bej81,
-            X-AVOSCloud-Application-Key : qs4o5iiywp86eznvok4tmhul360jczk7y67qj0ywbcq35iia
+            X-AVOSCloud-Application-Key : qs4o5iiywp86eznvok4tmhul360jczk7y67qj0ywbcq35iia,
+            X-AVOSCloud-Application-Production : 1,
+            Content-Type : application/json; charset=utf-8
 
     + Body
 
@@ -76,6 +78,8 @@ You can extract user's behavior list from start time to end time by invoking thi
 
             X-AVOSCloud-Application-Id  : pin72fr1iaxb7sus6newp250a4pl2n5i36032ubrck4bej81,
             X-AVOSCloud-Application-Key : qs4o5iiywp86eznvok4tmhul360jczk7y67qj0ywbcq35iia
+            X-AVOSCloud-Application-Production : 1,
+            Content-Type : application/json; charset=utf-8
 
     + Body
 
@@ -110,5 +114,54 @@ You can extract user's behavior list from start time to end time by invoking thi
                 "updatedAt":"2015-05-21T09:33:37.156Z"
             },
             "message":"behavior generated."
+        }
+        }
+        
+## Analyse Event [/event/]
+You can extract user's behavior list from start time to end time by invoking this method with specific ***userId***, ***startTime***, ***endTime*** and ***timeScale***.
+
+### Analyse user behaviors' event [POST]
++ Request (application/json)
+
+       
+    + Header
+
+            X-AVOSCloud-Application-Id  : pin72fr1iaxb7sus6newp250a4pl2n5i36032ubrck4bej81,
+            X-AVOSCloud-Application-Key : qs4o5iiywp86eznvok4tmhul360jczk7y67qj0ywbcq35iia
+            X-AVOSCloud-Application-Production : 1,
+            Content-Type : application/json; charset=utf-8
+
+    + Body
+
+            {
+            "userId": "555d8983e4b0b8cc433f5c62",
+            "behavior_len": 1800000,
+            "step": 300000,
+            "scale": "tenMinScale",
+            "algoType": "GMMHMM",
+            "tag": "for_testing",
+            "counterSetting": 500;
+            }
+        
++ Response 201 (application/json)
+
+        {  
+        "result":{  
+            "code":0,
+            "result":{  
+                "user":{  
+                    "__type":"Pointer",
+                    "className":"_User",
+                    "objectId":"555e92e6e4b06e8bb85473ce"
+                },
+                "behaviorLastUpdatedAt":{  
+                    "__type":"Date",
+                    "iso":"2015-05-29T08:14:58.428Z"
+                },
+                "objectId":"556453cce4b067f2f5b67b31",
+                "createdAt":"2015-05-26T11:06:52.469Z",
+                "updatedAt":"2015-05-29T08:14:56.412Z"
+            },
+            "message":"All events are generated correctly."
         }
         }
