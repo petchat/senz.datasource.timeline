@@ -118,7 +118,7 @@ You can extract user's behavior list from start time to end time by invoking thi
         }
         
 ## Analyse Event [/event/]
-You can extract user's behavior list from start time to end time by invoking this method with specific ***userId***, ***startTime***, ***endTime*** and ***timeScale***.
+By invoking this interface, you can calculate the lateset behavior event at specific user.
 
 ### Analyse user behaviors' event [POST]
 + Request (application/json)
