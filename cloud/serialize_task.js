@@ -12,7 +12,7 @@ exports.SerializeTask = function () {
         if (taskIndex < tasks.length) {
             _worker(tasks[taskIndex],
                 function (result) {
-                    console.log(result);
+                    //console.log(result);
                     taskIndex++;
                     worker();
                 },

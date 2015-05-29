@@ -378,7 +378,7 @@ exports.updateUserBehaviorPrediction = function (behavior_id, prediction){
 exports.getAllUsers = function (){
     var promise = new AV.Promise();
     var query = new AV.Query(User);
-    return query.find().then(
+    query.find().then(
         function (users){
             var user_id_list = [];
             users.forEach(function (user){
@@ -390,6 +390,7 @@ exports.getAllUsers = function (){
             promise.reject(error);
         }
     );
+    return promise;
 };
 
 var _searchLatestSenz = function (user_id, last_update_time, behavior_len){

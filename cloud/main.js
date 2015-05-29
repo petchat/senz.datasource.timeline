@@ -4,6 +4,7 @@ var method = require("cloud/method.js");
 var dao = require("cloud/dao.js");
 var algo = require("cloud/algo.js");
 var bp = require("cloud/behavior_process.js");
+var serialize_task = require("cloud/serialize_task.js");
 
 AV.Cloud.define("senz", function (request, response) {
     var is_training = request.params.isTraining;
@@ -90,7 +91,7 @@ AV.Cloud.define("event", function (request, response) {
     );
 });
 
-AV.Cloud.define("eventTimer", function (request, response) {
+AV.Cloud.define("eventTimerTest", function (request, response) {
 
     console.log("i'm here,eventTimer");
     var behavior_len = 30 * 60 * 1000, //
@@ -123,3 +124,62 @@ AV.Cloud.define("eventTimer", function (request, response) {
 });
 
 //bp.behaviorProcess(600000000, 100000000, "tenMinScale", "553e0e83e4b06b192e99bf3a");
+
+AV.Cloud.define("eventTimerProduction", function (request, response) {
+
+    console.log("i'm here,eventTimerProduction");
+    var behavior_len = 30 * 60 * 1000, //
+        step = 5 * 60 * 1000,
+        scale = "tenMinScale",
+        //user_id = "555e92e6e4b06e8bb85473ce",
+        algo_type = "GMMHMM",
+        tag = "for_testing",
+        counter_setting = 500;
+
+    var work = new serialize_task.SerializeTask();
+
+    var worker = function (user_id, resolve, reject) {
+        bp.behaviorProcess(behavior_len, step, scale, user_id, algo_type, tag, counter_setting).then(
+            function (event_results) {
+                console.log("All new events are generated.");
+                resolve(event_results);
+            },
+            function (error) {
+                console.log("There are some event are vacant, but still go on.");
+                reject(error);
+            }
+        );
+    };
+
+    dao.getAllUsers().then(
+        function (user_id_list){
+            console.log("The user list is :");
+            console.log(user_id_list);
+            user_id_list.forEach(function (user_id){
+                work.addTask(user_id);
+            });
+            work.setWorker(worker);
+            return work.begin();
+        },
+        function (error){
+            return AV.Promise.error(error);
+        }
+    ).then(
+        function (task){
+            //console.log(task);
+            console.log("All work done!");
+            response.success({
+                code: 0,
+                userIdList: task,
+                message: "Every users' events are generated correctly."
+            });
+        },
+        function (error){
+            response.success({
+                code: 0,
+                errorEventList: error,
+                message: "There is some error occur."
+            });
+        }
+    );
+});
