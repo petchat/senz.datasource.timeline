@@ -69,9 +69,10 @@ AV.Cloud.define("event", function (request, response) {
         scale = request.params.scale,
         user_id = request.params.userId,
         algo_type = request.params.algoType,
-        tag = request.params.tag;
+        tag = request.params.tag,
+        counter_setting = request.params.counterSetting;
 
-    bp.behaviorProcess(behavior_len, step, scale, user_id, algo_type, tag).then(
+    bp.behaviorProcess(behavior_len, step, scale, user_id, algo_type, tag, counter_setting).then(
         function (event_results) {
             response.success({
                 code: 0,
@@ -93,7 +94,7 @@ AV.Cloud.define("eventTimer", function (request, response) {
 
     console.log("i'm here,eventTimer");
     var behavior_len = 30 * 60 * 1000, //
-        step = 5 * 60 * 1000, //
+        step = 5 * 60 * 1000,
         scale = "tenMinScale",
         user_id = "555e92e6e4b06e8bb85473ce",
         algo_type = "GMMHMM",
