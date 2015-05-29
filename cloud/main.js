@@ -97,9 +97,10 @@ AV.Cloud.define("eventTimer", function (request, response) {
         scale = "tenMinScale",
         user_id = "555e92e6e4b06e8bb85473ce",
         algo_type = "GMMHMM",
-        tag = "for_testing";
+        tag = "for_testing",
+        counter_setting = 500;
 
-    bp.behaviorProcess(behavior_len, step, scale, user_id, algo_type, tag).then(
+    bp.behaviorProcess(behavior_len, step, scale, user_id, algo_type, tag, counter_setting).then(
         function (event_results) {
             console.log("All new events are generated.");
             response.success({

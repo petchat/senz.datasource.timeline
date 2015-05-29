@@ -304,23 +304,31 @@ exports.addBehavior = function (user_id, behavior_data, day_type, senz_id_list, 
     }
 };
 
-exports.getUserBehaviorLastUpdateTime = function (user_id) {
-    var promise = new AV.Promise();
+exports.getUserBehaviorLastUpdateTime = function (user_id, behavior_len) {
+    //var promise = new AV.Promise();
     var user = AV.Object.createWithoutData('_User', user_id);
     var query = new AV.Query(UserStatus);
     query.equalTo('user', user);
     query.ascending("timestamp");
-    query.first().then(
+    return query.first().then(
         function (result) {
             var timestamp = result.get("behaviorLastUpdatedAt");
-            console.log(timestamp);
-            promise.resolve(timestamp);
+            //console.log(timestamp);
+            //promise.resolve(timestamp);
+            return AV.Promise.as(timestamp);
         },
-        function (error_info) {
-            promise.reject(error_info);
+        function (error) {
+            //promise.reject(error_info);
+            return AV.Promise.error(error);
+        }
+    ).then(
+        function (timestamp){
+            return _searchLatestSenz(user_id, timestamp.getTime(), behavior_len)
+        },
+        function (error){
+            return AV.Promise.error(error);
         }
     );
-    return promise;
 };
 
 exports.updateUserBehaviorLastUpdatedTime = function (user_id, unix_timestamp) {

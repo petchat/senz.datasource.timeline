@@ -1,45 +1,3 @@
-var Work = (function SerializeTask() {
-    var taskIndex = 0,
-        tasks = [],
-        _worker,
-        promise = new AV.Promise();
-
-    function worker() {
-        if (taskIndex < tasks.length) {
-            _worker(tasks[taskIndex],
-                function (result) {
-                    console.log(result);
-                    taskIndex++;
-                    worker();
-                },
-                function (error) {
-                    console.log('!!error occurd');
-                    console.log(error);
-                    taskIndex++;
-                    worker();
-                }
-            );
-        }
-        else {
-            promise.resolve(tasks);
-        }
-        return promise;
-    }
-
-    return {
-        addTask: function (t) {
-            tasks.push(t);
-        },
-        setWorker: function (w) {
-            _worker = w;
-        },
-        begin: function () {
-            taskIndex = 0;
-            return worker();
-        }
-    }
-})();
-
 /**
  * Created by MeoWoodie on 5/22/15.
  */
@@ -51,7 +9,7 @@ var util = require("cloud/util.js");
 var config = require("cloud/config.js");
 var logger = require("cloud/logger.js");
 
-exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_type, tag) {
+exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_type, tag, counter_setting) {
     logger.info(config.logEventType.sta, "processing behavior");
     logger.info(config.logEventType.ret, "user<" + user_id + ">'s behavior last updated time");
     return dao.getUserBehaviorLastUpdateTime(user_id, behavior_len).then(
@@ -61,7 +19,50 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_typ
             var end_time = start_time + behavior_len;
             var cur_time = (new Date()).getTime();
 
-            while (end_time < cur_time){
+            var Work = (function SerializeTask() {
+                var taskIndex = 0,
+                    tasks = [],
+                    _worker,
+                    promise = new AV.Promise();
+
+                function worker() {
+                    //console.log('fuck!');
+                    if (taskIndex < tasks.length) {
+                        _worker(tasks[taskIndex],
+                            function (result) {
+                                console.log(result);
+                                taskIndex++;
+                                worker();
+                            },
+                            function (error) {
+                                console.log('!!error occurd');
+                                console.log(error);
+                                taskIndex++;
+                                worker();
+                            }
+                        );
+                    }
+                    else {
+                        promise.resolve(tasks);
+                    }
+                    return promise;
+                }
+
+                return {
+                    addTask: function (t) {
+                        tasks.push(t);
+                    },
+                    setWorker: function (w) {
+                        _worker = w;
+                    },
+                    begin: function () {
+                        taskIndex = 0;
+                        return worker();
+                    }
+                }
+            })();
+            var counter = 0;
+            while (end_time < cur_time && counter < counter_setting){
                 var during = {
                     startTime: start_time,
                     endTime: end_time
@@ -70,6 +71,7 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_typ
                 Work.addTask(during);
                 start_time += step;
                 end_time += step;
+                counter ++;
             }
 
             Work.setWorker(function (task, resolve, reject){
@@ -135,24 +137,28 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_typ
                 ).then(
                     function (updated_behavior){
                         resolve(updated_behavior);
+                        //return AV.Promise.as(updated_behavior);
                     },
                     function (error){
                         reject(error);
-                        //resolve(error);
+                        //return AV.Promise.error(error);
                     }
                 );
             });
             logger.info(config.logEventType.upd, "update user behavior last updated time as " + new Date(start_time));
-
+            //console.log('madan!');
             return Work.begin().then(
                 function (tasks) {
                     console.log('all completed');
+                    console.log(tasks);
                     return dao.updateUserBehaviorLastUpdatedTime(user_id, start_time);
                 }
             );
         }
     );
 };
+
+
 
 ///**
 // * Created by MeoWoodie on 5/22/15.
