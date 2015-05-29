@@ -8,6 +8,7 @@ var algo = require("cloud/algo.js");
 var util = require("cloud/util.js");
 var config = require("cloud/config.js");
 var logger = require("cloud/logger.js");
+var serialize_task = require("cloud/serialize_task.js");
 
 exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_type, tag, counter_setting) {
     logger.info(config.logEventType.sta, "processing behavior");
@@ -18,49 +19,8 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_typ
             var start_time = timestamp.getTime();
             var end_time = start_time + behavior_len;
             var cur_time = (new Date()).getTime();
+            var work = new serialize_task.SerializeTask();
 
-            var Work = (function SerializeTask() {
-                var taskIndex = 0,
-                    tasks = [],
-                    _worker,
-                    promise = new AV.Promise();
-
-                function worker() {
-                    //console.log('fuck!');
-                    if (taskIndex < tasks.length) {
-                        _worker(tasks[taskIndex],
-                            function (result) {
-                                console.log(result);
-                                taskIndex++;
-                                worker();
-                            },
-                            function (error) {
-                                console.log('!!error occurd');
-                                console.log(error);
-                                taskIndex++;
-                                worker();
-                            }
-                        );
-                    }
-                    else {
-                        promise.resolve(tasks);
-                    }
-                    return promise;
-                }
-
-                return {
-                    addTask: function (t) {
-                        tasks.push(t);
-                    },
-                    setWorker: function (w) {
-                        _worker = w;
-                    },
-                    begin: function () {
-                        taskIndex = 0;
-                        return worker();
-                    }
-                }
-            })();
             var counter = 0;
             while (end_time < cur_time && counter < counter_setting){
                 var during = {
@@ -68,13 +28,13 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_typ
                     endTime: end_time
                 };
                 //console.log(during);
-                Work.addTask(during);
+                work.addTask(during);
                 start_time += step;
                 end_time += step;
                 counter ++;
             }
 
-            Work.setWorker(function (task, resolve, reject){
+            work.setWorker(function (task, resolve, reject){
                 method.behaviorGenerator(user_id, task["startTime"], task["endTime"], scale, true).then(
                     function (saved_result) {
                         logger.info(config.logEventType.sav, "user<" + user_id + ">'s behavior from " + new Date(start_time) + " to " + new Date(end_time) + "is saved");
@@ -147,7 +107,7 @@ exports.behaviorProcess = function (behavior_len, step, scale, user_id, algo_typ
             });
             logger.info(config.logEventType.upd, "update user behavior last updated time as " + new Date(start_time));
             //console.log('madan!');
-            return Work.begin().then(
+            return work.begin().then(
                 function (tasks) {
                     console.log('all completed');
                     console.log(tasks);
