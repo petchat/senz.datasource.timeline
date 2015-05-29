@@ -309,12 +309,22 @@ exports.getUserBehaviorLastUpdateTime = function (user_id, behavior_len) {
     var user = AV.Object.createWithoutData('_User', user_id);
     var query = new AV.Query(UserStatus);
     query.equalTo('user', user);
-    query.ascending("timestamp");
+    query.ascending("behaviorLastUpdatedAt");
     return query.first().then(
         function (result) {
             var timestamp = result.get("behaviorLastUpdatedAt");
-            //console.log(timestamp);
-            //promise.resolve(timestamp);
+            // If you delete the timestamp in db, the query result will be null,
+            if (timestamp === null){
+                console.log("The user's last update time is lost!");
+                return AV.Promise.error("The user's last update time is lost");
+            }
+            // Others the result will be undefined, if a new user created.
+            else if (timestamp === undefined){
+                console.log("There is a new user created!");
+                timestamp = new Date();
+            }
+            // Tips: null == undefined, but not null === undefined.
+            console.log(timestamp);
             return AV.Promise.as(timestamp);
         },
         function (error) {
