@@ -109,7 +109,6 @@ AV.Cloud.define("eventTimer", function (request, response) {
                 result: event_results,
                 message: "All events are generated correctly."
             });
-
         },
         function (error) {
             console.log("There are some event are vacant, but still go on.");
