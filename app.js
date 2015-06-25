@@ -3,15 +3,16 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 var cloud = require("./cloud");
+var AV = require("leanengine");
 
 var app = express();
 
-// 设置 view 引擎
+// Set view engine.
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 
-// 加载云代码方法
+// Loading Cloud function
 app.use(cloud);
 
 app.use(bodyParser.json());
