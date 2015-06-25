@@ -5,7 +5,7 @@ var dao = require("./lib/dao.js");
 //var algo = require("./algo.js");
 var bp = require("./lib/behavior_process.js");
 var serialize_task = require("./lib/serialize_task.js");
-var AV = require('leanengine');
+var AV = require("leanengine");
 
 AV.Cloud.define("senz", function (request, response) {
     var is_training = request.params.isTraining;
@@ -94,7 +94,7 @@ AV.Cloud.define("event", function (request, response) {
 
 //AV.Cloud.define("eventTimerTest", function (request, response) {
 //
-//    console.log("i'm here,eventTimer");
+//    console.log("i"m here,eventTimer");
 //    var behavior_len = 30 * 60 * 1000, //
 //        step = 5 * 60 * 1000,
 //        scale = "tenMinScale",
