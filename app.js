@@ -6,8 +6,7 @@ var cookieParser = require("cookie-parser");
 var bodyParser   = require("body-parser");
 
 var cloud   = require("./cloud.js");
-var context = require("./routes/context.js");
-var events  = require("./routes/events.js");
+var service = require("./routes/service.js");
 
 var app = express();
 
@@ -28,9 +27,8 @@ app.get("/hello", function(req, res) {
     res.json({ currentTime: new Date() });
 });
 
-// Defined routers
-app.use("/context", context);
-app.use("/events", events);
+// Defined service routers
+app.use("/users", service);
 
 // 如果任何路由都没匹配到，则认为 404
 // 生成一个异常让后面的 err handler 捕获
