@@ -5,9 +5,9 @@ var path         = require("path");
 var cookieParser = require("cookie-parser");
 var bodyParser   = require("body-parser");
 
-var cloud  = require("./cloud.js");
-var status = require("./routes/status.js");
-var events = require("./routes/events.js");
+var cloud   = require("./cloud.js");
+var context = require("./routes/context.js");
+var events  = require("./routes/events.js");
 
 var app = express();
 
@@ -29,7 +29,7 @@ app.get("/hello", function(req, res) {
 });
 
 // Defined routers
-app.use("/status", status);
+app.use("/context", context);
 app.use("/events", events);
 
 // 如果任何路由都没匹配到，则认为 404
