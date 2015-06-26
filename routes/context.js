@@ -2,8 +2,8 @@ var router = require("express").Router();
 var AV     = require("leanengine");
 var dao    = require("../lib/dao.js");
 
-router.get("/:user_id", function (req, res){
-    var user_id = req.params.user_id;
+router.get("/", function (req, res){
+    var user_id = req.query.userId;
     dao.getLatestIntegratedSenz(user_id).then(
         function (result){
             var result_obj = {
