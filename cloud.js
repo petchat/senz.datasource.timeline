@@ -26,7 +26,7 @@ AV.Cloud.define("senz", function (request, response) {
 
 AV.Cloud.define("senzTimer", function (request, response) {
 
-    var is_training = 1;
+    var is_training = 0;
     console.log("i'm here");
     method.senzGenerator(is_training).then(
         function (bindedSenzes) {
