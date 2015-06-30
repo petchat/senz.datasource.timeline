@@ -1,0 +1,21 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Portal</title>
+  </head>
+  <body>
+    <h1>What are users CONTEXT NOW?</h1>
+    <ul>
+        <% for(var i=0; i<user_status.length; i++) {%>
+        <li><%= user_status[i] %></li>
+        <% } %>
+    </ul>
+
+    <h1>What are users EVENTS NOW?</h1>
+    <ul>
+        <% for(var i=0; i<user_events.length; i++) {%>
+        <li><%= user_events[i] %></li>
+        <% } %>
+    </ul>
+  </body>
+</html>

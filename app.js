@@ -7,6 +7,7 @@ var bodyParser   = require("body-parser");
 
 var cloud   = require("./cloud.js");
 var service = require("./routes/service.js");
+var portal  = require("./routes/portal.js");
 
 var app = express();
 
@@ -27,8 +28,11 @@ app.get("/hello", function(req, res) {
     res.json({ currentTime: new Date() });
 });
 
+
 // Defined service routers
 app.use("/users", service);
+// Defined portal routers
+app.use("/portal", portal);
 
 // 如果任何路由都没匹配到，则认为 404
 // 生成一个异常让后面的 err handler 捕获
