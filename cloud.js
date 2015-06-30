@@ -184,4 +184,84 @@ AV.Cloud.define("eventTimer", function (request, response) {
     );
 });
 
+
+var UserLocation = AV.Object.extend("UserLocation");
+var UserMotion = AV.Object.extend("UserMotion");
+var UserSound = AV.Object.extend("UserSound");
+
+var query_location = new AV.Query(UserLocation);
+var query_motion = new AV.Query(UserMotion);
+var query_sound = new AV.Query(UserSound);
+AV.Cloud.define("clearFlag", function (request, response) {
+    query_location.ascending("timestamp");
+    query_motion.ascending("timestamp");
+    query_sound.ascending("timestamp");
+
+    query_location.find().then(
+        function (rawdatas) {
+            console.log("Query Location:");
+            var timestamp_location = [];
+            var promises = [];
+            rawdatas.forEach(function (rawdata) {
+                var timestamp = rawdata.get("timestamp");
+                rawdata.set("processStatus", "untreated");
+                timestamp_location.push(timestamp);
+                promises.push(rawdata.save());
+            });
+            console.log("timestamp list:\n" + timestamp_location);
+            return AV.Promise.all(promises);
+        },
+        function (error) {
+            return AV.Promise.error(error);
+        }
+    ).then(
+        function () {
+            return query_motion.find();
+        },
+        function (error) {
+            return AV.Promise.error(error);
+        }
+    ).then(
+        function (rawdatas) {
+            console.log("Query Motion:");
+            var timestamp_motion = [];
+            var promises = [];
+            rawdatas.forEach(function (rawdata) {
+                var timestamp = rawdata.get("timestamp");
+                rawdata.set("processStatus", "untreated");
+                timestamp_location.push(timestamp);
+                promises.push(rawdata.save());
+            });
+            console.log("timestamp list:\n" + timestamp_motion);
+            return AV.Promise.all(promises);
+        },
+        function (error) {
+            return AV.Promise.error(error);
+        }
+    ).then(
+        function () {
+            return query_sound.find();
+        },
+        function (error) {
+            return AV.Promise.error(error);
+        }
+    ).then(
+        function (rawdatas) {
+            console.log("Query Sound:");
+            var timestamp_sound = [];
+            var promises = [];
+            rawdatas.forEach(function (rawdata) {
+                var timestamp = rawdata.get("timestamp");
+                rawdata.set("processStatus", "untreated");
+                timestamp_location.push(timestamp);
+                promises.push(rawdata.save());
+            });
+            console.log("timestamp list:\n" + timestamp_sound);
+            return AV.Promise.all(promises);
+        },
+        function (error) {
+            return AV.Promise.error(error);
+        }
+    );
+});
 module.exports = AV.Cloud;
