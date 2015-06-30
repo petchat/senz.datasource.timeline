@@ -229,7 +229,7 @@ AV.Cloud.define("clearFlag", function (request, response) {
             rawdatas.forEach(function (rawdata) {
                 var timestamp = rawdata.get("timestamp");
                 rawdata.set("processStatus", "untreated");
-                timestamp_location.push(timestamp);
+                timestamp_motion.push(timestamp);
                 promises.push(rawdata.save());
             });
             console.log("timestamp list:\n" + timestamp_motion);
@@ -253,7 +253,7 @@ AV.Cloud.define("clearFlag", function (request, response) {
             rawdatas.forEach(function (rawdata) {
                 var timestamp = rawdata.get("timestamp");
                 rawdata.set("processStatus", "untreated");
-                timestamp_location.push(timestamp);
+                timestamp_sound.push(timestamp);
                 promises.push(rawdata.save());
             });
             console.log("timestamp list:\n" + timestamp_sound);
