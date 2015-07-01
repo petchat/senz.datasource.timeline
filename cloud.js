@@ -165,26 +165,4 @@ AV.Cloud.define("clearFlag", function (request, response) {
     );
 });
 
-AV.Cloud.define("historicalSenzes", function (request, response){
-    var user_id    = request.params.userId,
-        start_time = request.params.startTime,
-        end_time   = request.params.endTime,
-        scale      = request.params.scale;
-
-    method.behaviorGenerator(user_id, start_time, end_time, scale, false).then(
-        function (historical_senzes){
-            response.success({
-                code: 0,
-                historicalSenzes: historical_senzes
-            });
-        },
-        function (error){
-            response.error({
-                code: 1,
-                message: error
-            });
-        }
-    );
-});
-
 module.exports = AV.Cloud;
