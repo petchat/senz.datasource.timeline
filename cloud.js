@@ -92,43 +92,7 @@ AV.Cloud.define("event", function (request, response) {
     );
 });
 
-//AV.Cloud.define("eventTimerTest", function (request, response) {
-//
-//    console.log("i"m here,eventTimer");
-//    var behavior_len = 30 * 60 * 1000, //
-//        step = 5 * 60 * 1000,
-//        scale = "tenMinScale",
-//        user_id = "555e92e6e4b06e8bb85473ce",
-//        algo_type = "GMMHMM",
-//        tag = "for_testing",
-//        counter_setting = 500;
-//
-//    bp.behaviorProcess(behavior_len, step, scale, user_id, algo_type, tag, counter_setting).then(
-//        function (event_results) {
-//            console.log("All new events are generated.");
-//            response.success({
-//                code: 0,
-//                result: event_results,
-//                message: "All events are generated correctly."
-//            });
-//        },
-//        function (error) {
-//            console.log("There are some event are vacant, but still go on.");
-//            response.success({
-//                code: 0,
-//                errorEventList: error,
-//                message: "Part of events are generated but user data is not integrated."
-//            });
-//
-//        }
-//    );
-//});
-
-//bp.behaviorProcess(600000000, 100000000, "tenMinScale", "553e0e83e4b06b192e99bf3a");
-
 AV.Cloud.define("eventTimer", function (request, response) {
-
-    console.log("i'm here,eventTimerProduction");
     var behavior_len = 30 * 60 * 1000, //
         step = 5 * 60 * 1000,
         scale = "tenMinScale",
@@ -184,84 +148,43 @@ AV.Cloud.define("eventTimer", function (request, response) {
     );
 });
 
-
-var UserLocation = AV.Object.extend("UserLocation");
-var UserMotion = AV.Object.extend("UserMotion");
-var UserSound = AV.Object.extend("UserSound");
-
-var query_location = new AV.Query(UserLocation);
-var query_motion = new AV.Query(UserMotion);
-var query_sound = new AV.Query(UserSound);
 AV.Cloud.define("clearFlag", function (request, response) {
-    query_location.ascending("timestamp");
-    query_motion.ascending("timestamp");
-    query_sound.ascending("timestamp");
+    var start_time = request.params.startTime;
+    var end_time   = request.params.endTime;
 
-    query_location.find().then(
-        function (rawdatas) {
-            console.log("Query Location:");
-            var timestamp_location = [];
-            var promises = [];
-            rawdatas.forEach(function (rawdata) {
-                var timestamp = rawdata.get("timestamp");
-                rawdata.set("processStatus", "untreated");
-                timestamp_location.push(timestamp);
-                promises.push(rawdata.save());
+    dao.clearFlag(start_time, end_time).then(
+        function (){
+            response.success({
+                code: 0,
+                message: "set flag from SENZED to UNTREATED."
             });
-            console.log("timestamp list:\n" + timestamp_location);
-            return AV.Promise.all(promises);
         },
-        function (error) {
-            return AV.Promise.error(error);
-        }
-    ).then(
-        function () {
-            return query_motion.find();
-        },
-        function (error) {
-            return AV.Promise.error(error);
-        }
-    ).then(
-        function (rawdatas) {
-            console.log("Query Motion:");
-            var timestamp_motion = [];
-            var promises = [];
-            rawdatas.forEach(function (rawdata) {
-                var timestamp = rawdata.get("timestamp");
-                rawdata.set("processStatus", "untreated");
-                timestamp_motion.push(timestamp);
-                promises.push(rawdata.save());
-            });
-            console.log("timestamp list:\n" + timestamp_motion);
-            return AV.Promise.all(promises);
-        },
-        function (error) {
-            return AV.Promise.error(error);
-        }
-    ).then(
-        function () {
-            return query_sound.find();
-        },
-        function (error) {
-            return AV.Promise.error(error);
-        }
-    ).then(
-        function (rawdatas) {
-            console.log("Query Sound:");
-            var timestamp_sound = [];
-            var promises = [];
-            rawdatas.forEach(function (rawdata) {
-                var timestamp = rawdata.get("timestamp");
-                rawdata.set("processStatus", "untreated");
-                timestamp_sound.push(timestamp);
-                promises.push(rawdata.save());
-            });
-            console.log("timestamp list:\n" + timestamp_sound);
-            return AV.Promise.all(promises);
-        },
-        function (error) {
-            return AV.Promise.error(error);
+        function (error){
+            response.error(error);
         }
     );
 });
+
+AV.Cloud.define("historicalSenzes", function (request, response){
+    var user_id    = request.params.userId,
+        start_time = request.params.startTime,
+        end_time   = request.params.endTime,
+        scale      = request.params.scale;
+
+    method.behaviorGenerator(user_id, start_time, end_time, scale, false).then(
+        function (historical_senzes){
+            response.success({
+                code: 0,
+                historicalSenzes: historical_senzes
+            });
+        },
+        function (error){
+            response.error({
+                code: 1,
+                message: error
+            });
+        }
+    );
+});
+
 module.exports = AV.Cloud;
