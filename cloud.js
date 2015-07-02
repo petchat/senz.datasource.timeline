@@ -129,7 +129,6 @@ AV.Cloud.define("eventTimer", function (request, response) {
         }
     ).then(
         function (task){
-            //console.log(task);
             console.log("All work done!");
             response.success({
                 code: 0,
