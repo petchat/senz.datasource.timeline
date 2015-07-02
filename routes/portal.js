@@ -92,7 +92,7 @@ router.get('/', function(req, res, next) {
             var jobs_list = user_id_list;
             var work      = serialize_task.SerializeTask();
             var worker    = function (job, resolve, reject){
-                dao.getLatestEvents(job, 1).then(
+                dao.getEvents(job, 1).then(
                     function (user_events){
                         var description = "User " + job + "'s EVENT is ";
                         if (!_.has(user_events[0], "event")){

@@ -93,7 +93,7 @@ AV.Cloud.define("event", function (request, response) {
 
 AV.Cloud.define("eventTimer", function (request, response) {
     var behavior_len = 30 * 60 * 1000, //
-        step = 5 * 60 * 1000,
+        step = 10 * 60 * 1000,
         scale = "tenMinScale",
         algo_type = "GMMHMM",
         tag = "for_testing",
