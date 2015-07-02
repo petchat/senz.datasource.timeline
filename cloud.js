@@ -50,7 +50,6 @@ AV.Cloud.define("behavior", function (request, response) {
         scale = request.params.timeScale,
         is_store = request.params.isStore;
 
-    //method.behaviorGenerator("s", 1429588400035, 1429588400038, "tenMinScale");
     method.behaviorGenerator(user, start_time, end_time, scale, is_store).then(
         function (behavior_refined) {
             response.success({
