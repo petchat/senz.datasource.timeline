@@ -96,7 +96,7 @@ AV.Cloud.define("eventTimer", function (request, response) {
         step = 10 * 60 * 1000,
         scale = "tenMinScale",
         algo_type = "GMMHMM",
-        tag = "for_testing",
+        tag = "randomTrain",
         counter_setting = 500;
 
     var work = new serialize_task.SerializeTask();
