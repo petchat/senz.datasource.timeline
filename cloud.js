@@ -43,23 +43,45 @@ AV.Cloud.define("senzTimer", function (request, response) {
         });
 });
 
-AV.Cloud.define("behavior", function (request, response) {
-    var user = request.params.userId,
-        start_time = request.params.startTime,
-        end_time = request.params.endTime,
-        scale = request.params.timeScale,
-        is_store = request.params.isStore;
+//AV.Cloud.define("behavior", function (request, response) {
+//    var user = request.params.userId,
+//        start_time = request.params.startTime,
+//        end_time = request.params.endTime,
+//        scale = request.params.timeScale,
+//        is_store = request.params.isStore;
+//
+//    method.behaviorGenerator(user, start_time, end_time, scale, is_store).then(
+//        function (behavior_refined) {
+//            response.success({
+//                code: 0,
+//                result: behavior_refined,
+//                message: "behavior generated."
+//            });
+//        },
+//        function (err) {
+//            response.error(err);
+//        }
+//    );
+//});
 
-    method.behaviorGenerator(user, start_time, end_time, scale, is_store).then(
-        function (behavior_refined) {
+AV.Cloud.define("behavior", function (request, response){
+    var user_id    = request.params.userId,
+        start_time = request.params.startTime,
+        end_time   = request.params.endTime,
+        scale      = request.params.timeScale;
+
+    bp.behaviorExtract(user_id, start_time, end_time, scale).then(
+        function (behavior){
             response.success({
                 code: 0,
-                result: behavior_refined,
-                message: "behavior generated."
+                result: behavior
             });
         },
-        function (err) {
-            response.error(err);
+        function (error){
+            response.error({
+                code: 1,
+                message: error
+            });
         }
     );
 });
@@ -137,8 +159,8 @@ AV.Cloud.define("eventTimer", function (request, response) {
             });
         },
         function (error){
-            response.success({
-                code: 0,
+            response.error({
+                code: 1,
                 errorEventList: error,
                 message: "There is some error occur."
             });
