@@ -7,7 +7,7 @@ router.get("/:userId/context", function (req, res){
     var user_id = req.params.userId,
         start_time = parseInt(req.query.startTime),
         end_time   = parseInt(req.query.endTime),
-        scale      = req.query.scale.toString();
+        scale      = req.query.scale;
 
     if (start_time != undefined && end_time != undefined && scale != undefined){
         if (end_time - start_time > 1000*3600*24){
