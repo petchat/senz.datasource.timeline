@@ -1,7 +1,7 @@
 var router = require("express").Router();
 var AV     = require("leanengine");
 var dao    = require("../lib/dao.js");
-var method = require("../lib/method.js");
+var sp     = require("../lib/senz_process.js");
 
 router.get("/:userId/context", function (req, res){
     var user_id = req.params.userId,
@@ -17,7 +17,7 @@ router.get("/:userId/context", function (req, res){
             });
         }
         else {
-            method.behaviorGenerator(user_id, start_time, end_time, scale, false).then(
+            sp.behaviorGenerator(user_id, start_time, end_time, scale, false).then(
                 function (historical_senzes) {
                     var result = [];
                     historical_senzes.forEach(function (senz) {

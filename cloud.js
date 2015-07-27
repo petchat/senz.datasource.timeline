@@ -1,16 +1,14 @@
-// Use AV.Cloud.define to define as many cloud functions as you want.
-// For example:
-var method = require("./lib/method.js");
-var dao = require("./lib/dao.js");
-//var algo = require("./algo.js");
-var bp = require("./lib/behavior_process.js");
+var sp             = require("./lib/senz_process.js");
+var dao            = require("./lib/dao.js");
+var bp             = require("./lib/behavior_process.js");
 var serialize_task = require("./lib/serialize_task.js");
-var AV = require("leanengine");
+var notification   = require("./lib/notification.js");
+var AV             = require("leanengine");
 
 AV.Cloud.define("senz", function (request, response) {
     var is_training = request.params.isTraining;
 
-    method.senzGenerator(is_training).then(
+    sp.senzGenerator(is_training).then(
         function (bindedSenzes) {
             //response.success("rawsenz generated," + bindedSenzes.length);
             response.success({
@@ -28,7 +26,7 @@ AV.Cloud.define("senzTimer", function (request, response) {
 
     var is_training = 0;
     console.log("i'm here");
-    method.senzGenerator(is_training).then(
+    sp.senzGenerator(is_training).then(
         function (bindedSenzes) {
             console.log("fuck i'm done");
             response.success({
