@@ -3,6 +3,7 @@ var dao            = require("./lib/dao.js");
 var bp             = require("./lib/behavior_process.js");
 var serialize_task = require("./lib/serialize_task.js");
 var notification   = require("./lib/notification.js");
+var ep             = require("./lib/event_process.js");
 var AV             = require("leanengine");
 
 AV.Cloud.define("senz", function (request, response) {
@@ -161,6 +162,55 @@ AV.Cloud.define("eventTimer", function (request, response) {
                 code: 1,
                 errorEventList: error,
                 message: "There is some error occur."
+            });
+        }
+    );
+});
+
+AV.Cloud.define("advancedEventTimer", function (request, response){
+    var start_time = request.params.startTime;
+    var end_time   = request.params.endTime;
+
+    var work = new serialize_task.SerializeTask();
+
+    var worker = function (user_id, resolve, reject) {
+        console.log("Start processing user: " + user_id);
+        ep.eventProcess(user_id, start_time, end_time).then(
+            function (){
+                resolve();
+            },
+            function (){
+                reject();
+            }
+        );
+    };
+
+    dao.getAllUsers().then(
+        function (user_id_list){
+            console.log("The user list is :");
+            console.log(user_id_list);
+            user_id_list.forEach(function (user_id){
+                work.addTask(user_id);
+            });
+            work.setWorker(worker);
+            return work.begin();
+        },
+        function (error){
+            return AV.Promise.error(error);
+        }
+    ).then(
+        function (task){
+            console.log("All work done!");
+            response.success({
+                code: 0,
+                userIdList: task,
+                message: "Every users' events are generated correctly."
+            });
+        },
+        function (error){
+            response.error({
+                code: 1,
+                message: "There is some error occur: " + error
             });
         }
     );
