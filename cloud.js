@@ -42,27 +42,6 @@ AV.Cloud.define("senzTimer", function (request, response) {
         });
 });
 
-//AV.Cloud.define("behavior", function (request, response) {
-//    var user = request.params.userId,
-//        start_time = request.params.startTime,
-//        end_time = request.params.endTime,
-//        scale = request.params.timeScale,
-//        is_store = request.params.isStore;
-//
-//    method.behaviorGenerator(user, start_time, end_time, scale, is_store).then(
-//        function (behavior_refined) {
-//            response.success({
-//                code: 0,
-//                result: behavior_refined,
-//                message: "behavior generated."
-//            });
-//        },
-//        function (err) {
-//            response.error(err);
-//        }
-//    );
-//});
-
 AV.Cloud.define("behavior", function (request, response){
     var user_id    = request.params.userId,
         start_time = request.params.startTime,
@@ -175,7 +154,16 @@ AV.Cloud.define("advancedEventTimer", function (request, response){
 
     var worker = function (user_id, resolve, reject) {
         console.log("Start processing user: " + user_id);
-        ep.eventProcess(user_id, start_time, end_time).then(
+        // Every time compute user's events from start_time to end_time.
+        // It would remove the events during this interval time in db first.
+        dao.removeEvents(user_id, start_time, end_time).then(
+            function (){
+                return ep.eventProcess(user_id, start_time, end_time);
+            },
+            function (error){
+                return AV.Promise.error(error);
+            }
+        ).then(
             function (){
                 resolve();
             },
@@ -215,6 +203,9 @@ AV.Cloud.define("advancedEventTimer", function (request, response){
         }
     );
 });
+
+
+// Utils API.
 
 AV.Cloud.define("clearFlag", function (request, response) {
     var start_time = request.params.startTime;
