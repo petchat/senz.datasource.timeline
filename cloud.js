@@ -211,24 +211,87 @@ AV.Cloud.define("eventTimer", function (request, response){
     );
 });
 
+AV.Cloud.afterSave('UserLocation', function(request) {
+    var data = {};
+    data['objectId'] = request.object.id;
+    data['userRawdataId'] = request.object._serverData.userRawdataId;
+    data['isTrainingSample'] = request.object._serverData.isTrainingSample;
+    data['city'] = request.object._serverData.city;
+    data['radius'] = request.object._serverData.radius;
+    data['street'] = request.object._serverData.street;
+    data['timestamp'] = request.object._serverData.timestamp;
+    data['province'] = request.object._serverData.province;
+    data['processStatus'] = request.object._serverData.processStatus;
+    data['street_number'] = request.object._serverData.street_number;
+    data['district'] = request.object._serverData.district;
+    data['nation'] = request.object._serverData.nation;
+    data['poiProbLv2'] = request.object._serverData.poiProbLv2;
+    data['poiProbLv1'] = request.object._serverData.poiProbLv1;
+    data['pois'] = JSON.parse(request.object._hashedJSON.pois);
+    //data['location'] = request.object._serverData.location;
 
-// Utils API.
+    data['createdAt'] = request.object.createdAt;
+    data['updatedAt'] = request.object.updatedAt;
 
-//AV.Cloud.define("clearFlag", function (request, response) {
-//    var start_time = request.params.startTime;
-//    var end_time   = request.params.endTime;
-//
-//    dao.clearFlag(start_time, end_time).then(
-//        function (){
-//            response.success({
-//                code: 0,
-//                message: "set flag from SENZED to UNTREATED."
-//            });
-//        },
-//        function (error){
-//            response.error(error);
-//        }
-//    );
-//});
+    var req = require('request');
+    req.post('http://119.254.111.40:3000/api/UserLocation').form(data);
+});
+
+AV.Cloud.afterSave('UserMotion', function(request) {
+    var data = {};
+    data['objectId'] = request.object.id;
+    data['userRawdataId'] = request.object._serverData.userRawdataId;
+    data['isTrainingSample'] = request.object._serverData.isTrainingSample;
+    data['timestamp'] = request.object._serverData.timestamp;
+    data['processStatus'] = request.object._serverData.processStatus;
+    //data['user'] = ?
+    data['sensor_data'] = JSON.parse(request.object._hashedJSON.sensor_data);
+    data['motionProb'] = request.object._serverData.motionProb;
+    data['createdAt'] = request.object.createdAt;
+    data['updatedAt'] = request.object.updatedAt;
+
+    var req = require('request');
+    req.post('http://119.254.111.40:3000/api/UserMotion').form(data);
+});
+
+AV.Cloud.afterSave('UserInfoLog', function(request){
+    var data = {};
+    data['objectId'] = request.object.id;
+    data['userRawdataId'] = request.object._serverData.userRawdataId;
+    data['timestamp'] = request.object._serverData.timestamp;
+    data['staticInfo'] = request.object._serverData.staticInfo;
+    data['applist'] = request.object._serverData.applist;
+    data['createdAt'] = request.object.createdAt;
+    data['updatedAt'] = request.object.updatedAt;
+
+    var req = require('request');
+    req.post('http://119.254.111.40:3000/api/UserInfoLog').form(data);
+});
+
+AV.Cloud.afterSave('UserCalendar', function(request) {
+    var data = {};
+    data['objectId'] = request.object.id;
+    data['type'] = request.object._serverData.type;
+    data['userRawdataId'] = request.object._serverData.userRawdataId;
+    data['timestamp'] = request.object._serverData.timestamp;
+    data['calendarInfo'] = JSON.parse(request.object._hashedJSON.calendarInfo);
+    data['createdAt'] = request.object.createdAt;
+    data['updatedAt'] = request.object.updatedAt;
+    var req = require('request');
+    req.post('http://119.254.111.40:3000/api/UserCalendar').form(data);
+});
+
+AV.Cloud.afterSave('Test', function(request) {
+    console.log(request.object);
+    console.log("@@@@@@@@@@@@@@");
+    var data = {};
+    data['createdAt'] = request.object.createdAt;
+    data['updatedAt'] = request.object.updatedAt;
+    data['mageia'] = request.object.attributes.mageia;
+
+    console.log(data);
+    var req = require('request');
+    req.post('http://119.254.111.40:3000/api/ForTests').form(request.object);
+});
 
 module.exports = AV.Cloud;
