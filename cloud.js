@@ -5,6 +5,7 @@ var serialize_task = require("./lib/serialize_task.js");
 var notification   = require("./lib/notification.js");
 var ep             = require("./lib/event_process.js");
 var AV             = require("leanengine");
+var logger         = require("./lib/logger.js");
 var _              = require("underscore");
 
 //AV.Cloud.define("senz", function (request, response) {
@@ -214,9 +215,12 @@ AV.Cloud.define("eventTimer", function (request, response){
 AV.Cloud.afterSave('UserLocation', function(request) {
     var data = {};
     data['objectId'] = request.object.id;
+    data['user_id'] = request.object._serverData.user.id;
     data['userRawdataId'] = request.object._serverData.userRawdataId;
     data['isTrainingSample'] = request.object._serverData.isTrainingSample;
     data['city'] = request.object._serverData.city;
+    data['synced'] = request.object._serverData.synced;
+    data['source'] = request.object._serverData.source || '';
     data['radius'] = request.object._serverData.radius;
     data['street'] = request.object._serverData.street;
     data['timestamp'] = request.object._serverData.timestamp;
@@ -228,35 +232,76 @@ AV.Cloud.afterSave('UserLocation', function(request) {
     data['poiProbLv2'] = request.object._serverData.poiProbLv2;
     data['poiProbLv1'] = request.object._serverData.poiProbLv1;
     data['pois'] = JSON.parse(request.object._hashedJSON.pois);
-    //data['location'] = request.object._serverData.location;
-
+    data['location'] = {'lat': request.object._serverData.location._latitude, 
+                        'lng': request.object._serverData.location._longitude};
+    data['senzedAt'] = request.object.senzedAt;
     data['createdAt'] = request.object.createdAt;
     data['updatedAt'] = request.object.updatedAt;
 
     var req = require('request');
-    req.post('http://119.254.111.40:3000/api/UserLocation').form(data);
+    req.post({url:"http://119.254.111.40:3000/api/UserLocations", json: data},
+        function(err,res,body){
+            if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
+                logger.info(JSON.stringify(err.message));
+            }
+            else{
+                var body_str = JSON.stringify(body);
+                logger.info(JSON.stringify(body_str));
+                logger.info("fuck \n");
+            }
+    });
+
+    var lean_cloud_data = {};
+    lean_cloud_data['user_id'] = request.object._serverData.user.id;
+    lean_cloud_data['location'] = request.object._serverData.location;
+    console.log(lean_cloud_data);
+    //req.post({url: "http://127.0.0.1:3000/v1/Location", json: lean_cloud_data},
+    req.post({url: "http://dashboard.avosapps.com/v1/Location", json: lean_cloud_data},
+        function(err,res,body){
+            if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
+                logger.info(JSON.stringify(err.message));
+            }else{
+                var body_str = JSON.stringify(body);
+                logger.info(body_str);
+                logger.info("fuck \n");
+            }
+    });
 });
 
 AV.Cloud.afterSave('UserMotion', function(request) {
     var data = {};
     data['objectId'] = request.object.id;
+    data['user_id'] = request.object._serverData.user.id;
     data['userRawdataId'] = request.object._serverData.userRawdataId;
+    data['type'] = request.object._serverData.type || '';
     data['isTrainingSample'] = request.object._serverData.isTrainingSample;
     data['timestamp'] = request.object._serverData.timestamp;
     data['processStatus'] = request.object._serverData.processStatus;
-    //data['user'] = ?
-    data['sensor_data'] = JSON.parse(request.object._hashedJSON.sensor_data);
+    data['rawInfo'] = JSON.parse(request.object._hashedJSON.rawInfo || '{}');
+    data['sensor_data'] = JSON.parse(request.object._hashedJSON.sensor_data || '{}');
     data['motionProb'] = request.object._serverData.motionProb;
+    data['senzedAt'] = request.object.senzedAt;
     data['createdAt'] = request.object.createdAt;
     data['updatedAt'] = request.object.updatedAt;
 
     var req = require('request');
-    req.post('http://119.254.111.40:3000/api/UserMotion').form(data);
+    req.post({url:"http://119.254.111.40:3000/api/UserMotions", json: data},
+        function(err,res,body){
+            if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
+                logger.info(JSON.stringify(err.message));
+            }
+            else{
+                var body_str = JSON.stringify(body);
+                logger.info(JSON.stringify(body_str));
+                logger.info("fuck \n");
+            }
+        });
 });
 
 AV.Cloud.afterSave('UserInfoLog', function(request){
     var data = {};
     data['objectId'] = request.object.id;
+    data['user_id'] = request.object._serverData.user.id;
     data['userRawdataId'] = request.object._serverData.userRawdataId;
     data['timestamp'] = request.object._serverData.timestamp;
     data['staticInfo'] = request.object._serverData.staticInfo;
@@ -265,12 +310,40 @@ AV.Cloud.afterSave('UserInfoLog', function(request){
     data['updatedAt'] = request.object.updatedAt;
 
     var req = require('request');
-    req.post('http://119.254.111.40:3000/api/UserInfoLog').form(data);
+    req.post({url:"http://119.254.111.40:3000/api/UserStaticInfos", json: data},
+        function(err,res,body){
+            if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
+                logger.info(JSON.stringify(err.message));
+            }
+            else{
+                var body_str = JSON.stringify(body);
+                logger.info(JSON.stringify(body_str));
+                logger.info("fuck \n");
+            }
+        });
+
+    var lean_cloud_data = {};
+    lean_cloud_data['user_id'] = request.object._serverData.user.id;
+    lean_cloud_data['staticInfo'] = request.object._serverData.staticInfo;
+    console.log(lean_cloud_data);
+    //req.post({url: "http://127.0.0.1:3000/v1/StaticInfo", json: lean_cloud_data},
+    req.post({url: "http://dashboard.avosapps.com/v1/StaticInfo", json: lean_cloud_data},
+        function(err,res,body){
+            if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
+                logger.info(JSON.stringify(err.message));
+            }
+            else{
+                var body_str = JSON.stringify(body);
+                logger.info(body_str);
+                logger.info("fuck \n");
+            }
+        });
 });
 
 AV.Cloud.afterSave('UserCalendar', function(request) {
     var data = {};
     data['objectId'] = request.object.id;
+    data['user_id'] = request.object._serverData.user.id;
     data['type'] = request.object._serverData.type;
     data['userRawdataId'] = request.object._serverData.userRawdataId;
     data['timestamp'] = request.object._serverData.timestamp;
@@ -278,7 +351,17 @@ AV.Cloud.afterSave('UserCalendar', function(request) {
     data['createdAt'] = request.object.createdAt;
     data['updatedAt'] = request.object.updatedAt;
     var req = require('request');
-    req.post('http://119.254.111.40:3000/api/UserCalendar').form(data);
+    req.post({url:"http://119.254.111.40:3000/api/UserCalendars", json: data},
+        function(err,res,body){
+            if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
+                logger.info(JSON.stringify(err.message));
+            }
+            else{
+                var body_str = JSON.stringify(body);
+                logger.info(JSON.stringify(body_str));
+                logger.info("fuck \n");
+            }
+        });
 });
 
 AV.Cloud.afterSave('Test', function(request) {
