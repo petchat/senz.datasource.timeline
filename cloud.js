@@ -25,24 +25,24 @@ var _              = require("underscore");
 //        });
 //});
 
-AV.Cloud.define("senzTimer", function (request, response) {
-
-    var is_training = 0;
-    console.log("i'm here");
-    sp.senzGenerator(is_training).then(
-        function (bindedSenzes) {
-            console.log("fuck i'm done");
-            response.success({
-                code: 0,
-                result: bindedSenzes,
-                message: "rawsenz generated."
-            });
-        },
-        function (err) {
-            console.log("i've had enough of you!");
-            response.error(err);
-        });
-});
+//AV.Cloud.define("senzTimer", function (request, response) {
+//
+//    var is_training = 0;
+//    console.log("i'm here");
+//    sp.senzGenerator(is_training).then(
+//        function (bindedSenzes) {
+//            console.log("fuck i'm done");
+//            response.success({
+//                code: 0,
+//                result: bindedSenzes,
+//                message: "rawsenz generated."
+//            });
+//        },
+//        function (err) {
+//            console.log("i've had enough of you!");
+//            response.error(err);
+//        });
+//});
 
 //AV.Cloud.define("behavior", function (request, response){
 //    var user_id    = request.params.userId,
@@ -93,124 +93,124 @@ AV.Cloud.define("senzTimer", function (request, response) {
 //    );
 //});
 
-AV.Cloud.define("behaviorTimer", function (request, response) {
-//    var behavior_len = 90 * 60 * 1000,
-//        step = 10 * 60 * 1000,
-//        scale = "tenMinScale",
-//        algo_type = "GMMHMM",
-//        tag = "randomTrain",
+//AV.Cloud.define("behaviorTimer", function (request, response) {
+////    var behavior_len = 90 * 60 * 1000,
+////        step = 10 * 60 * 1000,
+////        scale = "tenMinScale",
+////        algo_type = "GMMHMM",
+////        tag = "randomTrain",
+////        counter_setting = 500;
+//    var behavior_len = request.params.behaviorLen,
+//        step         = request.params.step,
+//        scale        = request.params.scale,
+//        algo_type    = request.params.algoType,
+//        tag          = request.params.tag,
 //        counter_setting = 500;
-    var behavior_len = request.params.behaviorLen,
-        step         = request.params.step,
-        scale        = request.params.scale,
-        algo_type    = request.params.algoType,
-        tag          = request.params.tag,
-        counter_setting = 500;
-
-    var work = new serialize_task.SerializeTask();
-
-    var worker = function (user_id, resolve, reject) {
-        bp.behaviorProcess(behavior_len, step, scale, user_id, algo_type, tag, counter_setting).then(
-            function (event_results) {
-                console.log("All new events are generated.");
-                resolve(event_results);
-            },
-            function (error) {
-                console.log("There are some event are vacant, but still go on.");
-                reject(error);
-            }
-        );
-    };
-
-    dao.getAllUsers().then(
-        function (user_id_list){
-            console.log("The user list is :");
-            console.log(user_id_list);
-            user_id_list.forEach(function (user_id){
-                work.addTask(user_id);
-            });
-            work.setWorker(worker);
-            return work.begin();
-        },
-        function (error){
-            return AV.Promise.error(error);
-        }
-    ).then(
-        function (task){
-            console.log("All work done!");
-            response.success({
-                code: 0,
-                userIdList: task,
-                message: "Every users' events are generated correctly."
-            });
-        },
-        function (error){
-            response.error({
-                code: 1,
-                errorEventList: error,
-                message: "There is some error occur."
-            });
-        }
-    );
-});
-
-AV.Cloud.define("eventTimer", function (request, response){
-    var start_time = request.params.startTime;
-    var end_time   = request.params.endTime;
-
-    var work = new serialize_task.SerializeTask();
-
-    var worker = function (user_id, resolve, reject) {
-        console.log("Start processing user: " + user_id);
-        // Every time compute user's events from start_time to end_time.
-        // It would remove the events during this interval time in db first.
-        dao.removeEvents(user_id, start_time, end_time).then(
-            function (){
-                return ep.eventProcess(user_id, start_time, end_time);
-            },
-            function (error){
-                return AV.Promise.error(error);
-            }
-        ).then(
-            function (){
-                resolve();
-            },
-            function (){
-                reject();
-            }
-        );
-    };
-
-    dao.getAllUsers().then(
-        function (user_id_list){
-            console.log("The user list is :");
-            console.log(user_id_list);
-            user_id_list.forEach(function (user_id){
-                work.addTask(user_id);
-            });
-            work.setWorker(worker);
-            return work.begin();
-        },
-        function (error){
-            return AV.Promise.error(error);
-        }
-    ).then(
-        function (task){
-            console.log("All work done!");
-            response.success({
-                code: 0,
-                userIdList: task,
-                message: "Every users' events are generated correctly."
-            });
-        },
-        function (error){
-            response.error({
-                code: 1,
-                message: "There is some error occur: " + error
-            });
-        }
-    );
-});
+//
+//    var work = new serialize_task.SerializeTask();
+//
+//    var worker = function (user_id, resolve, reject) {
+//        bp.behaviorProcess(behavior_len, step, scale, user_id, algo_type, tag, counter_setting).then(
+//            function (event_results) {
+//                console.log("All new events are generated.");
+//                resolve(event_results);
+//            },
+//            function (error) {
+//                console.log("There are some event are vacant, but still go on.");
+//                reject(error);
+//            }
+//        );
+//    };
+//
+//    dao.getAllUsers().then(
+//        function (user_id_list){
+//            console.log("The user list is :");
+//            console.log(user_id_list);
+//            user_id_list.forEach(function (user_id){
+//                work.addTask(user_id);
+//            });
+//            work.setWorker(worker);
+//            return work.begin();
+//        },
+//        function (error){
+//            return AV.Promise.error(error);
+//        }
+//    ).then(
+//        function (task){
+//            console.log("All work done!");
+//            response.success({
+//                code: 0,
+//                userIdList: task,
+//                message: "Every users' events are generated correctly."
+//            });
+//        },
+//        function (error){
+//            response.error({
+//                code: 1,
+//                errorEventList: error,
+//                message: "There is some error occur."
+//            });
+//        }
+//    );
+//});
+//
+//AV.Cloud.define("eventTimer", function (request, response){
+//    var start_time = request.params.startTime;
+//    var end_time   = request.params.endTime;
+//
+//    var work = new serialize_task.SerializeTask();
+//
+//    var worker = function (user_id, resolve, reject) {
+//        console.log("Start processing user: " + user_id);
+//        // Every time compute user's events from start_time to end_time.
+//        // It would remove the events during this interval time in db first.
+//        dao.removeEvents(user_id, start_time, end_time).then(
+//            function (){
+//                return ep.eventProcess(user_id, start_time, end_time);
+//            },
+//            function (error){
+//                return AV.Promise.error(error);
+//            }
+//        ).then(
+//            function (){
+//                resolve();
+//            },
+//            function (){
+//                reject();
+//            }
+//        );
+//    };
+//
+//    dao.getAllUsers().then(
+//        function (user_id_list){
+//            console.log("The user list is :");
+//            console.log(user_id_list);
+//            user_id_list.forEach(function (user_id){
+//                work.addTask(user_id);
+//            });
+//            work.setWorker(worker);
+//            return work.begin();
+//        },
+//        function (error){
+//            return AV.Promise.error(error);
+//        }
+//    ).then(
+//        function (task){
+//            console.log("All work done!");
+//            response.success({
+//                code: 0,
+//                userIdList: task,
+//                message: "Every users' events are generated correctly."
+//            });
+//        },
+//        function (error){
+//            response.error({
+//                code: 1,
+//                message: "There is some error occur: " + error
+//            });
+//        }
+//    );
+//});
 
 AV.Cloud.afterSave('UserLocation', function(request) {
     var data = {};
@@ -239,6 +239,20 @@ AV.Cloud.afterSave('UserLocation', function(request) {
     data['updatedAt'] = request.object.updatedAt;
 
     var req = require('request');
+    req.post({url: "http://leancloud.cn/1.1/functions/post_obj_from_timeline", 
+              headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
+                        "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"}, 
+              json: {'name': 'UserLocation', 'obj': request.object}},
+            function(err, res, body){
+                if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
+                    logger.info(JSON.stringify(err.message));
+                }
+                else{
+                    var body_str = JSON.stringify(body);
+                    logger.info(JSON.stringify(body_str));
+                    logger.info("saving to dashboard\n");
+                }
+            });
     req.post({url:"http://119.254.111.40:3000/api/UserLocations", json: data},
         function(err,res,body){
             if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
@@ -247,22 +261,6 @@ AV.Cloud.afterSave('UserLocation', function(request) {
             else{
                 var body_str = JSON.stringify(body);
                 logger.info(JSON.stringify(body_str));
-                logger.info("fuck \n");
-            }
-    });
-
-    var lean_cloud_data = {};
-    lean_cloud_data['user_id'] = request.object._serverData.user.id;
-    lean_cloud_data['location'] = request.object._serverData.location;
-    console.log(lean_cloud_data);
-    //req.post({url: "http://127.0.0.1:3000/v1/Location", json: lean_cloud_data},
-    req.post({url: "http://dashboard.avosapps.com/v1/Location", json: lean_cloud_data},
-        function(err,res,body){
-            if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
-                logger.info(JSON.stringify(err.message));
-            }else{
-                var body_str = JSON.stringify(body);
-                logger.info(body_str);
                 logger.info("fuck \n");
             }
     });
@@ -285,6 +283,20 @@ AV.Cloud.afterSave('UserMotion', function(request) {
     data['updatedAt'] = request.object.updatedAt;
 
     var req = require('request');
+    req.post({url: "http://leancloud.cn/1.1/functions/post_obj_from_timeline", 
+              headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
+                        "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"}, 
+              json: {'name': 'UserMotion', 'obj': request.object}},
+            function(err, res, body){
+                if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
+                    logger.info(JSON.stringify(err.message));
+                }
+                else{
+                    var body_str = JSON.stringify(body);
+                    logger.info(JSON.stringify(body_str));
+                    logger.info("saving to dashboard\n");
+                }
+            });
     req.post({url:"http://119.254.111.40:3000/api/UserMotions", json: data},
         function(err,res,body){
             if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
@@ -321,23 +333,74 @@ AV.Cloud.afterSave('UserInfoLog', function(request){
                 logger.info("fuck \n");
             }
         });
+    req.post({url: "http://leancloud.cn/1.1/functions/post_obj_from_timeline", 
+              headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
+                        "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"}, 
+              json: {'name': 'UserInfoLog', 'obj': request.object}},
+            function(err, res, body){
+                if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
+                    logger.info(JSON.stringify(err.message));
+                }
+                else{
+                    var body_str = JSON.stringify(body);
+                    logger.info(JSON.stringify(body_str));
+                    logger.info("saving to dashboard\n");
+                }
+            });
+});
 
-    var lean_cloud_data = {};
-    lean_cloud_data['user_id'] = request.object._serverData.user.id;
-    lean_cloud_data['staticInfo'] = request.object._serverData.staticInfo;
-    console.log(lean_cloud_data);
-    //req.post({url: "http://127.0.0.1:3000/v1/StaticInfo", json: lean_cloud_data},
-    req.post({url: "http://dashboard.avosapps.com/v1/StaticInfo", json: lean_cloud_data},
-        function(err,res,body){
-            if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
-                logger.info(JSON.stringify(err.message));
-            }
-            else{
-                var body_str = JSON.stringify(body);
-                logger.info(body_str);
-                logger.info("fuck \n");
-            }
-        });
+AV.Cloud.afterSave('UPoiVisitLog', function(request) {
+    var req = require('request');
+    req.post({url: "http://leancloud.cn/1.1/functions/post_obj_from_timeline", 
+              headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
+                        "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"}, 
+              json: {'name': 'UPoiVisitLog', 'obj': request.object}},
+            function(err, res, body){
+                if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
+                    logger.info(JSON.stringify(err.message));
+                }
+                else{
+                    var body_str = JSON.stringify(body);
+                    logger.info(JSON.stringify(body_str));
+                    logger.info("saving to dashboard\n");
+                }
+            });
+});
+
+AV.Cloud.afterSave('UserEvent', function(request) {
+    var req = require('request');
+    req.post({url: "http://leancloud.cn/1.1/functions/post_obj_from_timeline", 
+              headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
+                        "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"}, 
+              json: {'name': 'UserEvent', 'obj': request.object}},
+            function(err, res, body){
+                if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
+                    logger.info(JSON.stringify(err.message));
+                }
+                else{
+                    var body_str = JSON.stringify(body);
+                    logger.info(JSON.stringify(body_str));
+                    logger.info("saving to dashboard\n");
+                }
+            });
+});
+
+AV.Cloud.afterSave('UserActivity', function(request) {
+    var req = require('request');
+    req.post({url: "http://leancloud.cn/1.1/functions/post_obj_from_timeline", 
+              headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
+                        "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"}, 
+              json: {'name': 'UserActivity', 'obj': request.object}},
+            function(err, res, body){
+                if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
+                    logger.info(JSON.stringify(err.message));
+                }
+                else{
+                    var body_str = JSON.stringify(body);
+                    logger.info(JSON.stringify(body_str));
+                    logger.info("saving to dashboard\n");
+                }
+            });
 });
 
 AV.Cloud.afterSave('UserCalendar', function(request) {
