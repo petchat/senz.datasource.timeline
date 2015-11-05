@@ -239,7 +239,7 @@ AV.Cloud.afterSave('UserLocation', function(request) {
     data['updatedAt'] = request.object.updatedAt;
 
     var req = require('request');
-    req.post({url: "http://leancloud.cn/1.1/functions/post_obj_from_timeline", 
+    req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline", 
               headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
                         "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"}, 
               json: {'name': 'UserLocation', 'obj': request.object}},
@@ -283,7 +283,7 @@ AV.Cloud.afterSave('UserMotion', function(request) {
     data['updatedAt'] = request.object.updatedAt;
 
     var req = require('request');
-    req.post({url: "http://leancloud.cn/1.1/functions/post_obj_from_timeline", 
+    req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline", 
               headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
                         "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"}, 
               json: {'name': 'UserMotion', 'obj': request.object}},
@@ -333,7 +333,7 @@ AV.Cloud.afterSave('UserInfoLog', function(request){
                 logger.info("fuck \n");
             }
         });
-    req.post({url: "http://leancloud.cn/1.1/functions/post_obj_from_timeline", 
+    req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline", 
               headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
                         "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"}, 
               json: {'name': 'UserInfoLog', 'obj': request.object}},
@@ -351,7 +351,7 @@ AV.Cloud.afterSave('UserInfoLog', function(request){
 
 AV.Cloud.afterSave('UPoiVisitLog', function(request) {
     var req = require('request');
-    req.post({url: "http://leancloud.cn/1.1/functions/post_obj_from_timeline", 
+    req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline", 
               headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
                         "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"}, 
               json: {'name': 'UPoiVisitLog', 'obj': request.object}},
@@ -369,7 +369,7 @@ AV.Cloud.afterSave('UPoiVisitLog', function(request) {
 
 AV.Cloud.afterSave('UserEvent', function(request) {
     var req = require('request');
-    req.post({url: "http://leancloud.cn/1.1/functions/post_obj_from_timeline", 
+    req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline", 
               headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
                         "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"}, 
               json: {'name': 'UserEvent', 'obj': request.object}},
@@ -387,7 +387,7 @@ AV.Cloud.afterSave('UserEvent', function(request) {
 
 AV.Cloud.afterSave('UserActivity', function(request) {
     var req = require('request');
-    req.post({url: "http://leancloud.cn/1.1/functions/post_obj_from_timeline", 
+    req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline", 
               headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
                         "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"}, 
               json: {'name': 'UserActivity', 'obj': request.object}},
