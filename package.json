@@ -21,6 +21,7 @@
     "node-logentries": "latest",
     "request": "latest",
     "underscore": "latest",
-    "simplesets": "latest"
+    "simplesets": "latest",
+    "timer-promise": "latest"
   }
 }
