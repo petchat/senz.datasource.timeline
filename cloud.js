@@ -1,9 +1,9 @@
-var sp             = require("./lib/senz_process.js");
-var dao            = require("./lib/dao.js");
-var bp             = require("./lib/behavior_process.js");
-var serialize_task = require("./lib/serialize_task.js");
+//var sp             = require("./lib/senz_process.js");
+//var dao            = require("./lib/dao.js");
+//var bp             = require("./lib/behavior_process.js");
+//var serialize_task = require("./lib/serialize_task.js");
 var notification   = require("./lib/notification.js");
-var ep             = require("./lib/event_process.js");
+//var ep             = require("./lib/event_process.js");
 var AV             = require("leanengine");
 var logger         = require("./lib/logger.js");
 var config         = require("./lib/config.js");
@@ -214,20 +214,12 @@ var _              = require("underscore");
 //    );
 //});
 
-var get_post_wilddog_config = function(situation, sub_situtation, user_id){
-    var wd_config = config['wilddog_config'];
-    var wd_strategy = strategy['wilddog_strategy'];
+var post_wilddog_config = function(user_id, config){
     var req = require('request');
-
-    var period = wd_strategy[situation][sub_situtation].period;
-    wd_config['sensor'].collector.period = period;
-    wd_config['location'].collector.period = period;
-    wd_config['calendar'].collector.period = period;
-
     req.post({url: "https://leancloud.cn/1.1/functions/notify_new_config",
             headers: {"X-LC-Id": "wsbz6p3ouef94ubvsdqk2jfty769wkyed3qsry5hebi2va2h",
                 "X-LC-Key": "6z6n0w3dopxmt32oi2eam2dt0orh8rxnqc8lgpf2hqnar4tr"},
-            json: {"userId": user_id, "config": wd_config}},
+            json: {"userId": user_id, "config": config}},
         function(err, res, body){
             if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
                 logger.info(JSON.stringify(err.message));
@@ -238,6 +230,23 @@ var get_post_wilddog_config = function(situation, sub_situtation, user_id){
                 logger.info("saving to dashboard\n");
             }
         });
+};
+
+var get_post_wilddog_config = function(situation, sub_situtation, user_id, threshold){
+    var wd_strategy = strategy['wilddog_strategy'];
+    var level = "l2";
+
+    console.log('userid: ' + user_id + ' ' + sub_situtation);
+    if(wd_strategy[situation] && wd_strategy[situation][sub_situtation]){
+        level = wd_strategy[situation][sub_situtation];
+    }
+
+    console.log('level: ' + level);
+    post_wilddog_config(user_id, config['wilddog_config_' + level]);
+    setTimeout(function(){
+        console.log('Timeout!!!');
+        post_wilddog_config(user_id, config['wilddog_config_' + 'l2']);
+    }, threshold*1000);
 };
 
 AV.Cloud.afterSave('UserLocation', function(request) {
@@ -310,8 +319,9 @@ AV.Cloud.afterSave('UserMotion', function(request) {
     data['createdAt'] = request.object.createdAt;
     data['updatedAt'] = request.object.updatedAt;
 
-    var motion = 'driving';
-    get_post_wilddog_config('motion', motion, request.object._serverData.user.id);
+    var motionProb = request.object._serverData.motionProb;
+    var motion = _.keys(motionProb).sort(function(a, b){return motionProb[a] < motionProb[b] ? 1 : -1})[0];
+    get_post_wilddog_config('motion', motion, request.object._serverData.user.id, 10);
 
     var req = require('request');
     req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline", 
