@@ -1,7 +1,6 @@
 var notification   = require("./lib/notification.js");
 var AV             = require("leanengine");
 var logger         = require("./lib/logger.js");
-var config         = require("./lib/config.js");
 var strategy       = require("./lib/strategy.js");
 var _              = require("underscore");
 
@@ -30,6 +29,8 @@ AV.Cloud.afterSave('UserLocation', function(request) {
     data['senzedAt'] = request.object.senzedAt;
     data['createdAt'] = request.object.createdAt;
     data['updatedAt'] = request.object.updatedAt;
+
+    strategy.get_post_wilddog_config(request.object._serverData.user.id, 'location', 'test');
 
     var req = require('request');
     req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline", 
@@ -77,7 +78,7 @@ AV.Cloud.afterSave('UserMotion', function(request) {
 
     var motionProb = request.object._serverData.motionProb;
     var motion = _.keys(motionProb).sort(function(a, b){return motionProb[a] < motionProb[b] ? 1 : -1})[0];
-    strategy.get_post_wilddog_config('motion', motion, request.object._serverData.user.id, 10);
+    strategy.get_post_wilddog_config(request.object._serverData.user.id, 'motion', motion);
 
     var req = require('request');
     req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline", 
