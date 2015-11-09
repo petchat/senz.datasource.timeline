@@ -30,7 +30,9 @@ AV.Cloud.afterSave('UserLocation', function(request) {
     data['createdAt'] = request.object.createdAt;
     data['updatedAt'] = request.object.updatedAt;
 
-    strategy.get_post_wilddog_config(request.object._serverData.user.id, 'location', 'test');
+    var poiProbLv2 = request.object._serverData.poiProbLv2;
+    var poi = _.keys(poiProbLv2).sort(function(a, b){return poiProbLv2[a] < poiProbLv2[b] ? 1 : -1})[0];
+    strategy.get_post_wilddog_config(request.object._serverData.user.id, 'location', poi);
 
     var req = require('request');
     req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline", 
@@ -39,7 +41,7 @@ AV.Cloud.afterSave('UserLocation', function(request) {
               json: {'name': 'UserLocation', 'obj': request.object}},
             function(err, res, body){
                 if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
-                    logger.info(JSON.stringify(err.message));
+                    logger.info(err);
                 }
                 else{
                     var body_str = JSON.stringify(body);
