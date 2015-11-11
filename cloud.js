@@ -145,22 +145,39 @@ AV.Cloud.afterSave('UserInfoLog', function(request){
             });
 });
 
-AV.Cloud.afterSave('UPoiVisitLog', function(request) {
+AV.Cloud.afterSave('HomeOfficeStatus', function(request) {
     var req = require('request');
-    req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline", 
-              headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
-                        "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"}, 
-              json: {'name': 'UPoiVisitLog', 'obj': request.object}},
-            function(err, res, body){
-                if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
-                    logger.info(err);
-                }
-                else{
-                    var body_str = JSON.stringify(body);
-                    logger.info(JSON.stringify(body_str));
-                }
-            });
+    req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline",
+            headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
+                "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"},
+            json: {'name': 'HomeOfficeStatus', 'obj': request.object}},
+        function(err, res, body){
+            if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
+                logger.info(err);
+            }
+            else{
+                var body_str = JSON.stringify(body);
+                logger.info(JSON.stringify(body_str));
+            }
+        });
 });
+
+//AV.Cloud.afterSave('UPoiVisitLog', function(request) {
+//    var req = require('request');
+//    req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline",
+//              headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
+//                        "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"},
+//              json: {'name': 'UPoiVisitLog', 'obj': request.object}},
+//            function(err, res, body){
+//                if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
+//                    logger.info(err);
+//                }
+//                else{
+//                    var body_str = JSON.stringify(body);
+//                    logger.info(JSON.stringify(body_str));
+//                }
+//            });
+//});
 
 AV.Cloud.afterSave('UserEvent', function(request) {
     var req = require('request');
