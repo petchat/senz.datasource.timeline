@@ -79,8 +79,8 @@ AV.Cloud.afterSave('UserMotion', function(request) {
     data['updatedAt'] = request.object.updatedAt;
 
     var motionProb = request.object._serverData.motionProb;
-    var motion = _.keys(motionProb).sort(function(a, b){return motionProb[a] < motionProb[b] ? 1 : -1})[0];
-    strategy.get_post_wilddog_config(request.object._serverData.user.id, 'motion', motion);
+    var motion = _.keys(motionProb).sort(function(a, b){return motionProb[a] < motionProb[b] ? 1 : -1});
+    strategy.get_post_wilddog_config(request.object._serverData.user.id, 'motion', motion.toString());
 
     var req = require('request');
     req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline", 
@@ -146,6 +146,9 @@ AV.Cloud.afterSave('UserInfoLog', function(request){
 });
 
 AV.Cloud.afterSave('HomeOfficeStatus', function(request) {
+    var status = request.object._serverData.status;
+    strategy.get_post_wilddog_config(request.object._serverData.user.id, 'home_office_status', status);
+
     var req = require('request');
     req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline",
             headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
