@@ -10,6 +10,7 @@ AV.Cloud.afterSave('UserLocation', function(request) {
     data['user_id'] = request.object._serverData.user.id;
     data['userRawdataId'] = request.object._serverData.userRawdataId;
     data['isTrainingSample'] = request.object._serverData.isTrainingSample;
+    data['near_home_office'] = request.object._serverData.near_home_office;
     data['city'] = request.object._serverData.city;
     data['synced'] = request.object._serverData.synced;
     data['source'] = request.object._serverData.source || '';
@@ -24,7 +25,7 @@ AV.Cloud.afterSave('UserLocation', function(request) {
     data['poiProbLv2'] = request.object._serverData.poiProbLv2;
     data['poiProbLv1'] = request.object._serverData.poiProbLv1;
     data['pois'] = JSON.parse(request.object._hashedJSON.pois);
-    data['location'] = {'lat': request.object._serverData.location._latitude, 
+    data['location'] = {'lat': request.object._serverData.location._latitude,
                         'lng': request.object._serverData.location._longitude};
     data['senzedAt'] = request.object.senzedAt;
     data['createdAt'] = request.object.createdAt;
@@ -35,9 +36,9 @@ AV.Cloud.afterSave('UserLocation', function(request) {
     strategy.get_post_wilddog_config(request.object._serverData.user.id, 'location', poi);
 
     var req = require('request');
-    req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline", 
+    req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline",
               headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
-                        "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"}, 
+                        "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"},
               json: {'name': 'UserLocation', 'obj': request.object}},
             function(err, res, body){
                 if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
