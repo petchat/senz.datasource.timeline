@@ -2,6 +2,7 @@ var notification   = require("./lib/notification.js");
 var AV             = require("leanengine");
 var logger         = require("./lib/logger.js");
 var strategy       = require("./lib/strategy.js");
+var req            = require('request');
 var _              = require("underscore");
 
 AV.Cloud.afterSave('UserLocation', function(request) {
@@ -35,7 +36,6 @@ AV.Cloud.afterSave('UserLocation', function(request) {
     var poi = _.keys(poiProbLv2).sort(function(a, b){return poiProbLv2[a] < poiProbLv2[b] ? 1 : -1})[0];
     strategy.get_post_wilddog_config(request.object._serverData.user.id, 'location', poi);
 
-    var req = require('request');
     req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline",
               headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
                         "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"},
@@ -46,8 +46,7 @@ AV.Cloud.afterSave('UserLocation', function(request) {
                 }
                 else{
                     var body_str = JSON.stringify(body);
-                    logger.info(JSON.stringify(body_str));
-                    logger.info("saving to dashboard\n");
+                    logger.info("dashboard", JSON.stringify(body_str));
                 }
             });
     req.post({url:"http://119.254.111.40:3000/api/UserLocations", json: data},
@@ -57,8 +56,7 @@ AV.Cloud.afterSave('UserLocation', function(request) {
             }
             else{
                 var body_str = JSON.stringify(body);
-                logger.info(JSON.stringify(body_str));
-                logger.info("fuck \n");
+                logger.info("mongodb", JSON.stringify(body_str));
             }
     });
 });
@@ -83,7 +81,6 @@ AV.Cloud.afterSave('UserMotion', function(request) {
     var motion = _.keys(motionProb).sort(function(a, b){return motionProb[a] < motionProb[b] ? 1 : -1});
     strategy.get_post_wilddog_config(request.object._serverData.user.id, 'motion', motion.toString());
 
-    var req = require('request');
     req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline", 
               headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
                         "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"}, 
