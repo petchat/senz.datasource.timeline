@@ -117,7 +117,6 @@ AV.Cloud.afterSave('UserInfoLog', function(request){
     data['createdAt'] = request.object.createdAt;
     data['updatedAt'] = request.object.updatedAt;
 
-    var req = require('request');
     req.post({url:"http://119.254.111.40:3000/api/UserStaticInfos", json: data},
         function(err,res,body){
             if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
@@ -147,7 +146,6 @@ AV.Cloud.afterSave('HomeOfficeStatus', function(request) {
     var status = request.object._serverData.status;
     strategy.get_post_wilddog_config(request.object._serverData.user.id, 'home_office_status', status);
 
-    var req = require('request');
     req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline",
             headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
                 "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"},
@@ -181,7 +179,6 @@ AV.Cloud.afterSave('HomeOfficeStatus', function(request) {
 //});
 
 AV.Cloud.afterSave('UserEvent', function(request) {
-    var req = require('request');
     req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline", 
               headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
                         "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"}, 
@@ -198,7 +195,6 @@ AV.Cloud.afterSave('UserEvent', function(request) {
 });
 
 AV.Cloud.afterSave('UserActivity', function(request) {
-    var req = require('request');
     req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline", 
               headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
                         "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"}, 
@@ -224,7 +220,7 @@ AV.Cloud.afterSave('UserCalendar', function(request) {
     data['calendarInfo'] = JSON.parse(request.object._hashedJSON.calendarInfo);
     data['createdAt'] = request.object.createdAt;
     data['updatedAt'] = request.object.updatedAt;
-    var req = require('request');
+
     req.post({url:"http://119.254.111.40:3000/api/UserCalendars", json: data},
         function(err,res,body){
             if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
@@ -246,7 +242,6 @@ AV.Cloud.afterSave('Test', function(request) {
     data['mageia'] = request.object.attributes.mageia;
 
     console.log(data);
-    var req = require('request');
     req.post('http://119.254.111.40:3000/api/ForTests').form(request.object);
 });
 
