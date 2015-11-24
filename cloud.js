@@ -4,6 +4,15 @@ var logger         = require("./lib/logger.js");
 var strategy       = require("./lib/strategy.js");
 var req            = require('request');
 var _              = require("underscore");
+var memwatch       = require('memwatch-next');
+
+memwatch.on('leak', function(info) {
+    console.log("leak  occured");
+    console.log(info);
+});
+memwatch.on('stats', function(stats) {
+    console.log(stats);
+});
 
 AV.Cloud.afterSave('UserLocation', function(request) {
     var data = {};
@@ -81,9 +90,9 @@ AV.Cloud.afterSave('UserMotion', function(request) {
     var motion = _.keys(motionProb).sort(function(a, b){return motionProb[a] < motionProb[b] ? 1 : -1});
     strategy.get_post_wilddog_config(request.object._serverData.user.id, 'motion', motion.toString());
 
-    req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline", 
+    req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline",
               headers: {"X-LC-Id": "2x27tso41inyau4rkgdqts0mrao1n6rq1wfd6644vdrz2qfo",
-                        "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"}, 
+                        "X-LC-Key": "3fuabth1ar3sott9sgxy4sf8uq31c9x8bykugv3zh7eam5ll"},
               json: {'name': 'UserMotion', 'obj': request.object}},
             function(err, res, body){
                 if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){

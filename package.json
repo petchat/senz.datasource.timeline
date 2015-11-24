@@ -23,6 +23,7 @@
     "underscore": "latest",
     "simplesets": "latest",
     "timer-promise": "latest",
-    "request-promise": "latest"
+    "request-promise": "latest",
+    "memwatch-next": "latest"
   }
 }
