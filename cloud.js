@@ -51,7 +51,7 @@ AV.Cloud.afterSave('UserLocation', function(request) {
               json: {'name': 'UserLocation', 'obj': request.object}},
             function(err, res, body){
                 if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
-                    logger.info(err);
+                    logger.error(err);
                 }
                 else{
                     var body_str = JSON.stringify(body);
@@ -61,11 +61,12 @@ AV.Cloud.afterSave('UserLocation', function(request) {
     req.post({url:"http://119.254.111.40:3000/api/UserLocations", json: data},
         function(err,res,body){
             if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
-                logger.info(JSON.stringify(err.message));
+                console.log('UserLocation POST failed!');
+                logger.error("UserLocation", JSON.stringify(err.message));
             }
             else{
                 var body_str = JSON.stringify(body);
-                logger.info("mongodb", JSON.stringify(body_str));
+                logger.info("UserLocation", JSON.stringify(body_str));
             }
     });
 });
@@ -96,21 +97,22 @@ AV.Cloud.afterSave('UserMotion', function(request) {
               json: {'name': 'UserMotion', 'obj': request.object}},
             function(err, res, body){
                 if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
-                    logger.info(err);
+                    logger.error("UserMotion", err);
                 }
                 else{
                     var body_str = JSON.stringify(body);
-                    logger.info(JSON.stringify(body_str));
+                    logger.info("UserMotion", JSON.stringify(body_str));
                 }
             });
     req.post({url:"http://119.254.111.40:3000/api/UserMotions", json: data},
         function(err,res,body){
             if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
-                logger.info(err);
+                console.log('UserMotion POST failed!');
+                logger.error("UserMotion", err);
             }
             else{
                 var body_str = JSON.stringify(body);
-                logger.info(JSON.stringify(body_str));
+                logger.info("UserMotion", JSON.stringify(body_str));
             }
         });
 });
@@ -129,11 +131,12 @@ AV.Cloud.afterSave('UserInfoLog', function(request){
     req.post({url:"http://119.254.111.40:3000/api/UserStaticInfos", json: data},
         function(err,res,body){
             if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
-                logger.info(err);
+                console.log('UserMotion POST failed!');
+                logger.error("UserInfoLog", err);
             }
             else{
                 var body_str = JSON.stringify(body);
-                logger.info(JSON.stringify(body_str));
+                logger.info("UserInfoLog", JSON.stringify(body_str));
             }
         });
     req.post({url: "https://leancloud.cn/1.1/functions/post_obj_from_timeline", 
@@ -161,11 +164,12 @@ AV.Cloud.afterSave('HomeOfficeStatus', function(request) {
             json: {'name': 'HomeOfficeStatus', 'obj': request.object}},
         function(err, res, body){
             if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
-                logger.info(err);
+                console.log('UserMotion POST failed!');
+                logger.error("HomeOfficeStatus", err);
             }
             else{
                 var body_str = JSON.stringify(body);
-                logger.info(JSON.stringify(body_str));
+                logger.info("HomeOfficeStatus", JSON.stringify(body_str));
             }
         });
 });
