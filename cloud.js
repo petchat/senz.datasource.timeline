@@ -37,6 +37,7 @@ AV.Cloud.afterSave('UserLocation', function(request) {
     data['pois'] = JSON.parse(request.object._hashedJSON.pois);
     data['location'] = {'lat': request.object._serverData.location._latitude,
                         'lng': request.object._serverData.location._longitude};
+    data['weather'] = request.object._serverData.weather;
     data['senzedAt'] = request.object.senzedAt;
     data['createdAt'] = request.object.createdAt;
     data['updatedAt'] = request.object.updatedAt;
