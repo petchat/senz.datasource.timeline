@@ -200,11 +200,11 @@ AV.Cloud.afterSave('UserEvent', function(request) {
               json: {'name': 'UserEvent', 'obj': request.object}},
             function(err, res, body){
                 if(err != null ||  (res.statusCode != 200 && res.statusCode !=201) ){
-                    logger.info(err);
+                    logger.info("UserEvent", err);
                 }
                 else{
                     var body_str = JSON.stringify(body);
-                    logger.info(JSON.stringify(body_str));
+                    logger.info("UserEvent", JSON.stringify(body_str));
                 }
             });
 });
